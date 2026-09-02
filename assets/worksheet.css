@@ -22,7 +22,7 @@
   --fs-stem:11.8pt;
   --fs-part:11.2pt;
   --write-line:8.6mm;
-  --notebook-grid:5mm;
+  --notebook-grid:calc(var(--write-line) / 2);   /* משבצת חשבון — 4.3 מ"מ */
 }
 
 *{box-sizing:border-box;margin:0;padding:0}
@@ -80,7 +80,7 @@ body{
 }
 .page-number{
   flex:none;
-  min-width:40px;
+  min-width:40px;               /* גם מספר תלת-ספרתי יושב כולו בתוך העיגול */
   height:40px;
   padding:0 4px;
   border:2px solid var(--title-blue);
@@ -98,8 +98,7 @@ body{
   flex:1 1 auto;
   display:flex;
   flex-direction:column;
-  justify-content:space-between;
-  gap:3.6mm;
+  gap:5.5mm;
   min-height:0;
 }
 
@@ -107,7 +106,7 @@ body{
 .q{
   display:flex;
   flex-direction:column;
-  gap:2.3mm;
+  gap:2.6mm;
   break-inside:avoid;
 }
 .q-head{
@@ -138,8 +137,8 @@ body{
 }
 
 /* ---------- גרף ----------
-   ברירת המחדל אינה מותחת גרף פשוט אוטומטית לכל רוחב הדף.
-   מחולל הדפים יכול לבחור compact / medium / wide לפי מורכבות הגרף. */
+   רוחב הגרף נגזר מכמות המידע: המחולל בוחר compact / medium / wide
+   לפי מספר הסדרות ומספר הנקודות. גרף פשוט אינו תופס חצי עמוד. */
 .q-graph{
   width:min(100%,156mm);
   margin:.6mm auto 1.2mm;
@@ -148,19 +147,47 @@ body{
   overflow:hidden;
   background:#fff;
 }
-.q-graph svg.wsgraph{display:block;width:100%;height:auto;max-height:108mm}
-.q-graph.narrow,.q-graph.compact{width:min(100%,122mm)}
-.q-graph.medium{width:min(100%,146mm)}
+.q-graph svg.wsgraph{display:block;width:100%;height:auto}
+/* כותרת SVG ארוכה נשארת בתוך ה-viewBox בלי להקטין את שאר תוויות הגרף. */
+.q-graph svg.wsgraph > rect:first-child + text{font-size:15px !important}
+/* תוויות קווי סף מודגשות מוכנסות מעט פנימה באמצעות גופן קומפקטי אך קריא. */
+.q-graph svg.wsgraph > text[style*="fill:#b45309"][style*="font-size:14px"]{font-size:12px !important}
+.q-graph.narrow,.q-graph.compact{width:min(100%,118mm)}
+.q-graph.medium{width:min(100%,142mm)}
 .q-graph.wide{width:100%}
+
+/* גרף וטבלה קטנה זה לצד זה — חוסך גובה עמוד במקום שתי רצועות נפרדות */
+.visual-row{
+  display:grid;
+  grid-template-columns:minmax(0,1.55fr) minmax(38mm,.7fr);
+  gap:4.5mm;
+  align-items:center;
+}
+.visual-row .q-graph{width:100%;max-width:none;margin:0}
+.visual-row .q-table{
+  margin:0;
+  justify-self:center;
+  align-self:center;
+  width:100%;
+  max-width:100%;
+  min-width:0;
+  table-layout:fixed;
+}
+.visual-row .q-table th,.visual-row .q-table td{
+  padding:1.2mm 1.6mm;
+  min-width:0;
+  overflow-wrap:anywhere;
+  word-break:normal;
+}
 
 /* ---------- טבלה ---------- */
 .q-table{
   border-collapse:collapse;
-  width:max-content;
+  width:max-content;          /* רוחב לפי התוכן — טבלה צרה אינה נמתחת על כל העמוד */
   max-width:100%;
-  margin:.5mm auto 1mm;
-  font-size:10.6pt;
   table-layout:auto;
+  margin:.5mm 0 1mm;
+  font-size:10.6pt;
 }
 .q-table th,.q-table td{
   border:.3mm solid var(--text-main);
@@ -170,40 +197,30 @@ body{
   min-width:14mm;
   height:8mm;
 }
-.q-table td{unicode-bidi:plaintext}
 .q-table th{background:var(--bg-subtle);font-weight:600;font-size:10pt}
+.q-table td,.q-table th{unicode-bidi:plaintext}
 
-/* מספרים, ביטויים ושברים נשמרים בכיוון מתמטי תקין בתוך RTL */
-.num,.math,.frac{
+/* ---------- מספר מתמטי בתוך טקסט עברי ----------
+   מבודד את המספר מהכיוון של המשפט, כך ש-−3 נשאר −3 ולא 3−.  */
+.math-num{
   direction:ltr;
   unicode-bidi:isolate;
   display:inline-block;
+  white-space:nowrap;
   font-variant-numeric:tabular-nums;
 }
-.frac{
-  display:inline-grid;
-  grid-template-rows:auto 1px auto;
-  align-items:center;
-  justify-items:center;
-  line-height:1.05;
-  vertical-align:middle;
-  min-width:1.3em;
-}
-.frac::before{content:"";grid-row:2;width:100%;border-top:1px solid currentColor}
-.frac .numr{grid-row:1;padding:0 .12em}
-.frac .den{grid-row:3;padding:0 .12em}
 
 /* ---------- תתי-סעיפים: אות סעיף בלבד ---------- */
 .q-parts{
   list-style:none;
   display:flex;
   flex-direction:column;
-  gap:2.2mm;
+  gap:2.4mm;
 }
 .q-parts > li{
   display:flex;
   flex-direction:column;
-  gap:1.4mm;
+  gap:1.6mm;
 }
 .p-row{
   display:flex;
@@ -220,45 +237,45 @@ body{
   font-size:var(--fs-part);
   line-height:1.5;
   flex:1;
-  min-width:0;
 }
 
-/* ---------- תיבת מענה קנונית — תלת־ממדית עדינה ---------- */
+/* ---------- תיבת מענה קנונית („סגנון 5") ----------
+   רקע לבן, מסגרת 1.35px #1f2a44, פינות 8px, גובה 30px,
+   צל תלת-ממדי עדין. הרוחב נגזר מהתשובה הצפויה.            */
 .abox{
   display:inline-block;
   height:30px;
-  background:linear-gradient(180deg,#fff 0%,#fbfdff 100%);
+  background:#fff;
   border:1.35px solid var(--box-ink);
-  border-radius:7px;
-  box-shadow:0 1px 0 #fff inset,1.8px 2px 0 rgba(31,42,68,.20);
+  border-radius:8px;
+  box-shadow:1.5px 1.5px 0 rgba(31,42,68,.18);
   vertical-align:middle;
-  flex:none;
 }
 .abox.w-xs{width:20mm}
 .abox.w-s{width:30mm}
 .abox.w-m{width:44mm}
 .abox.w-l{width:62mm}
 
-/* השלמה בתוך משפט — תמיד באותה שורה כחלק מהמשפט */
+/* השלמה בתוך משפט — קו עדין שעליו התלמיד כותב, לא תיבה */
 .blank{
   display:inline-block;
-  min-width:18mm;
+  min-width:13mm;
   height:4.6mm;
-  border-bottom:.45mm solid var(--box-ink);
+  border-bottom:.4mm solid var(--rule);
+  white-space:nowrap;
   vertical-align:baseline;
   margin:0 .8mm;
-  white-space:nowrap;
 }
 
-/* תשובה מילולית באותה השורה */
-.p-text-inline{flex:0 1 auto;font-size:var(--fs-part);line-height:1.5;min-width:0}
-.abox.fill{flex:1 1 35mm;min-width:28mm;max-width:70mm;height:26px}
+/* תשובה מילולית באותה השורה: הטקסט ברוחבו הטבעי, התיבה ממלאת את השאר */
+.p-text-inline{flex:none;font-size:var(--fs-part);line-height:1.5}
+.abox.fill{flex:1;min-width:28mm;height:26px}
 
 /* שורת תיבות ממוספרות לסעיף עם מספור פנימי */
 .p-answer.multi{display:flex;flex-wrap:wrap;gap:2mm 8mm}
 .p-answer .multi-item{display:inline-flex;align-items:center;gap:2mm}
 
-/* שורת מענה: תיבה + יחידה */
+/* שורת מענה: תיבה + יחידה, בתחילת השורה (ימין) */
 .p-answer{
   display:flex;
   align-items:center;
@@ -271,23 +288,23 @@ body{
 /* מבנה תשובה מרובת ערכים — מכל LTR כדי שהסדר לא יתהפך */
 .wexpr{
   direction:ltr;
-  unicode-bidi:isolate;
   display:inline-flex;
   align-items:center;
   gap:2mm;
 }
 .wexpr .wop{font-weight:600;font-size:12pt;color:var(--box-ink)}
 
-/* ---------- אזור כתיבה להסבר: משבצות חשבון בלבד, ללא שורות ---------- */
+/* ---------- אזור כתיבה להסבר: משבצות חשבון, לא שורות אופקיות ----------
+   בלי inline style: המחולל בוחר ans-1 עד ans-6                */
 .ans{
   margin-inline-start:7.6mm;
-  border:.25mm solid var(--grid-line);
+  border:.25mm solid var(--border-light);
   border-radius:1.2mm;
   background-image:
-    linear-gradient(to right,var(--border-light) .22mm,transparent .22mm),
-    linear-gradient(to bottom,var(--border-light) .22mm,transparent .22mm);
+    linear-gradient(to right,var(--border-light) .2mm,transparent .2mm),
+    linear-gradient(to bottom,var(--border-light) .2mm,transparent .2mm);
   background-size:var(--notebook-grid) var(--notebook-grid);
-  background-position:-.2mm -.2mm;
+  background-position:-.1mm -.1mm;
 }
 .ans-1{height:calc(1*var(--write-line))}
 .ans-2{height:calc(2*var(--write-line))}
@@ -295,30 +312,35 @@ body{
 .ans-4{height:calc(4*var(--write-line))}
 .ans-5{height:calc(5*var(--write-line))}
 .ans-6{height:calc(6*var(--write-line))}
+.ans-7{height:calc(7*var(--write-line))}
+.ans-8{height:calc(8*var(--write-line))}
 
-/* ---------- אזור דרך ממוסגר + תשובה סופית ---------- */
+/* ---------- אזור דרך ממוסגר + תשובה סופית משמאל ----------
+   דרך חישוב נכתבת על משבצות חשבון — לא על שורות אופקיות.        */
 .work{
   margin-inline-start:7.6mm;
   border:.3mm solid var(--grid-line);
   border-radius:1.6mm;
   background-image:
-    linear-gradient(to right,var(--border-light) .22mm,transparent .22mm),
-    linear-gradient(to bottom,var(--border-light) .22mm,transparent .22mm);
+    linear-gradient(to right,var(--border-light) .2mm,transparent .2mm),
+    linear-gradient(to bottom,var(--border-light) .2mm,transparent .2mm);
   background-size:var(--notebook-grid) var(--notebook-grid);
-  background-position:-.2mm -.2mm;
+  background-position:-.1mm -.1mm;
 }
 .work-2{height:calc(2*var(--write-line))}
 .work-3{height:calc(3*var(--write-line))}
 .work-4{height:calc(4*var(--write-line))}
 .work-5{height:calc(5*var(--write-line))}
 .work-6{height:calc(6*var(--write-line))}
+.work-7{height:calc(7*var(--write-line))}
+.work-8{height:calc(8*var(--write-line))}
 
 /* התשובה הסופית — מתחת לדרך, מיושרת לצד שמאל */
 .ans-final{
   display:flex;
   align-items:center;
   gap:2mm;
-  justify-content:flex-end;
+  justify-content:flex-end;      /* ב-RTL: הקצה השמאלי */
   padding-inline-start:7.6mm;
   font-size:var(--fs-part);
 }
@@ -329,15 +351,41 @@ body{
 .choices{
   list-style:none;
   display:flex;
-  flex-wrap:wrap;
+  flex-wrap:wrap;                /* אפשרויות קצרות מסתדרות בכמה טורים — חוסך שורות */
   gap:1.6mm 8mm;
   padding-inline-start:7.6mm;
 }
 .choices li{display:flex;align-items:center;gap:2.4mm;font-size:var(--fs-part)}
 
-/* שורת שאלה + תיבה באותה שורה */
-.p-row-inline{align-items:center;gap:2.4mm;flex-wrap:nowrap}
+/* שורת שאלה + תיבה באותה שורה: התיבה צמודה לטקסט, לא בקצה העמוד */
+.p-row-inline{align-items:center;gap:2.4mm}
 .p-row-inline .p-text{flex:0 1 auto;min-width:0}
+
+/* השלמת משפט — הסעיף כולו זורם כמשפט אחד: סימון, מלל, מקום ההשלמה
+   והמשך המלל באותה שורה. אין מצב שהמשפט מתחיל במקום אחד והמקום
+   להשלמה בורח למקום אחר (§23–§25).                                */
+.p-row.sentence-completion{
+  display:block;
+  font-size:var(--fs-part);
+  line-height:1.95;
+}
+.p-row.sentence-completion .p-mark{
+  display:inline-block;
+  min-width:5.4mm;
+  margin-inline-end:1.6mm;
+}
+.p-row.sentence-completion .p-text{display:inline}
+.completion-unit{
+  display:inline-block;
+  white-space:nowrap;
+  max-width:100%;
+  vertical-align:baseline;
+}
+.completion-unit.coordinate{direction:ltr;unicode-bidi:isolate}
+.completion-unit .blank{max-width:46mm}
+.p-row.sentence-completion .abox,
+.p-row.sentence-completion .blank{margin:0 1.4mm}
+.p-row.sentence-completion .unit{color:var(--ink-soft);white-space:nowrap}
 .p-row-inline .ans-lbl{font-weight:600;white-space:nowrap}
 .p-row .abox,.p-row .wexpr{align-self:center}
 .choices .box{
@@ -348,7 +396,26 @@ body{
   border-radius:.8mm;
 }
 
-/* היגדים על הגרף */
+/* שבר פשוט: מונה מעל מכנה, קו שבר אמיתי */
+.frac{
+  display:inline-flex;
+  flex-direction:column;
+  align-items:center;
+  vertical-align:middle;
+  line-height:1.1;
+  margin:0 .6mm;
+  direction:ltr;
+  unicode-bidi:isolate;
+}
+.frac .fr-nu{font-size:9.5pt;padding:0 1mm;font-variant-numeric:tabular-nums}
+.frac .fr-de{
+  font-size:9.5pt;
+  padding:0 1mm;
+  border-top:.35mm solid var(--text-main);
+  font-variant-numeric:tabular-nums;
+}
+
+/* היגדים על הגרף: התלמיד כותב נכון / לא נכון / אי אפשר לדעת על הקו */
 .stmts{
   display:flex;
   flex-direction:column;
@@ -358,6 +425,12 @@ body{
 .stmt{display:flex;align-items:baseline;gap:3mm}
 .stmt-text{font-size:var(--fs-part);line-height:1.5;flex:0 1 auto}
 .blank.wide{min-width:22mm}
+
+/* רוחב קו ההשלמה נגזר מהתשובה הצפויה — מילה קצרה מקבלת קו קצר,
+   ביטוי שלם מקבל קו ארוך (§16–§19). */
+.blank.w-s{min-width:20mm}
+.blank.w-m{min-width:32mm}
+.blank.w-l{min-width:46mm}
 
 .hint{
   font-size:9.6pt;
@@ -369,8 +442,8 @@ body{
 .a4-page > .gz-footer{
   flex:0 0 auto;
   margin-top:auto;
-  padding-top:2.2mm;
-  border-top:2px solid #1e40af;
+  padding-top:2.2mm;                       /* הכיתוב יורד מעט — ממורכז מול תחתית הדף */
+  border-top:2px solid #1e40af;            /* קו כחול כהה לכל רוחב התוכן */
   text-align:center;
   line-height:1.3;
 }
@@ -383,6 +456,14 @@ body{
   font-size:9.5px;
   color:var(--ink-soft);
 }
+
+/* ---------- דף צפוף ----------
+   נבחר על ידי המחולל כשעמוד מלא כמעט עד הסוף: מצמצם רווחים בלבד,
+   בלי להקטין גופן, כדי שלא תיווצר גלישה.                       */
+.a4-page.page-tight .ws-body{gap:3.6mm}
+.a4-page.page-tight .q{gap:2mm}
+.a4-page.page-tight .q-parts{gap:1.7mm}
+.a4-page.page-tight .q-parts > li{gap:1.1mm}
 
 /* ---------- עמודי שער/הוראות ---------- */
 .section-title{
