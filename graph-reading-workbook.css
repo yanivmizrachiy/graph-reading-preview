@@ -39,9 +39,7 @@ button:disabled { cursor: not-allowed; opacity: .42; }
   backdrop-filter: blur(10px);
 }
 
-.print-menu-wrap {
-  position: relative;
-}
+.print-menu-wrap { position: relative; }
 
 .button,
 .page-button,
@@ -155,13 +153,13 @@ input:focus-visible {
   font-weight: 700;
 }
 
-#pdfFrame {
+#bookFrame {
   display: block;
   width: 100%;
   height: calc(100dvh - 122px);
   min-height: 680px;
   border: 0;
-  background: #e8eef7;
+  background: #fff;
 }
 
 .viewer-fallback {
@@ -195,7 +193,7 @@ input:focus-visible {
   border: 0;
   border-radius: 0;
 }
-.viewer-panel:fullscreen #pdfFrame {
+.viewer-panel:fullscreen #bookFrame {
   flex: 1;
   min-height: 0;
   height: auto;
@@ -216,10 +214,7 @@ input:focus-visible {
     font-size: .86rem;
   }
 
-  .print-menu {
-    min-width: 154px;
-  }
-
+  .print-menu { min-width: 154px; }
   .workbook-shell { padding: 0; }
 
   .viewer-panel {
@@ -245,10 +240,9 @@ input:focus-visible {
     min-height: 34px;
   }
 
-  #pdfFrame {
+  #bookFrame {
     height: calc(100dvh - 104px);
     min-height: 520px;
-    background: #fff;
   }
 
   .credits {
@@ -259,7 +253,7 @@ input:focus-visible {
 
 @media (max-height: 520px) and (orientation: landscape) {
   .action-bar { position: relative; }
-  #pdfFrame {
+  #bookFrame {
     height: calc(100dvh - 96px);
     min-height: 260px;
   }
