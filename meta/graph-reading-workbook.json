@@ -3,22 +3,22 @@
   "release": "graph-reading-20260902",
   "title": "קריאת גרפים",
   "subtitle": "חוברת עבודה — גרפים מחיי היום-יום",
-  "pageCount": 156,
+  "pageCount": 165,
   "format": "A4",
   "files": {
     "color": {
       "label": "גרסה צבעונית",
       "filename": "graph-reading-color.pdf",
       "path": "assets/pdf/graph-reading-color.pdf",
-      "bytes": 8493735,
-      "sha256": "c36bb4f609c11e2228f177999ce28976c39d7354604a7a64268583097674a955"
+      "bytes": 8703768,
+      "sha256": "2ce39dd27aa6e4f9e97003a69f3a16402a86f1b961e2ac11cc280d00b951056b"
     },
     "bw": {
       "label": "גרסה בשחור־לבן",
       "filename": "graph-reading-bw.pdf",
       "path": "assets/pdf/graph-reading-bw.pdf",
-      "bytes": 8122247,
-      "sha256": "cbaf41a8559922a3467a6ee22f7b58e5581c48c978761a24a9921d56c3f2b885"
+      "bytes": 8289623,
+      "sha256": "5119d3df0b6d83d1b3f754af9b9329424fe6d1c40dea01e859bdb04e2f7fa93a"
     }
   },
   "credits": [

@@ -541,18 +541,9 @@ body{
   display:block;
 }
 
-/* ---------- תצלום בין השאלות ----------
-   רצועה נמוכה בתחתית עמוד שנשאר בו מקום. היא אינה דוחקת תוכן ואינה
-   מחליפה שטח עבודה: היא נכנסת רק אחרי ששטח הכתיבה והגרף כבר מוצו.   */
-.page-photo{
-  flex:none;
-  border-radius:2mm;
-  overflow:hidden;
-  border:.3mm solid var(--border-light);
-}
-.page-photo img{display:block;width:100%;height:32mm;object-fit:cover}
+/* גיליון תצלום שלם בין השאלות — אותו טיפול כמו השער */
 @media print{
-  .a4-page.cover,.page-photo img{
+  .a4-page.cover{
     -webkit-print-color-adjust:exact;
     print-color-adjust:exact;
   }

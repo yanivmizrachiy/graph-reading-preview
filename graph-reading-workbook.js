@@ -36,7 +36,7 @@
   }
 
   function clampPage(value) {
-    const total = manifest?.pageCount || 156;
+    const total = manifest?.pageCount || 165;
     return Math.min(total, Math.max(1, Number(value) || 1));
   }
 
