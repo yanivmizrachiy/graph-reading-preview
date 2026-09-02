@@ -22,6 +22,7 @@
   --fs-stem:11.8pt;
   --fs-part:11.2pt;
   --write-line:8.6mm;
+  --notebook-grid:5mm;
 }
 
 *{box-sizing:border-box;margin:0;padding:0}
@@ -79,7 +80,7 @@ body{
 }
 .page-number{
   flex:none;
-  min-width:40px;               /* גם מספר תלת-ספרתי יושב כולו בתוך העיגול */
+  min-width:40px;
   height:40px;
   padding:0 4px;
   border:2px solid var(--title-blue);
@@ -97,7 +98,8 @@ body{
   flex:1 1 auto;
   display:flex;
   flex-direction:column;
-  gap:5.5mm;
+  justify-content:space-between;
+  gap:3.6mm;
   min-height:0;
 }
 
@@ -105,7 +107,7 @@ body{
 .q{
   display:flex;
   flex-direction:column;
-  gap:2.6mm;
+  gap:2.3mm;
   break-inside:avoid;
 }
 .q-head{
@@ -135,23 +137,30 @@ body{
   font-size:10.4pt;
 }
 
-/* ---------- גרף ---------- */
+/* ---------- גרף ----------
+   ברירת המחדל אינה מותחת גרף פשוט אוטומטית לכל רוחב הדף.
+   מחולל הדפים יכול לבחור compact / medium / wide לפי מורכבות הגרף. */
 .q-graph{
-  margin:.6mm 0 1.2mm;
+  width:min(100%,156mm);
+  margin:.6mm auto 1.2mm;
   border:.3mm solid var(--border-light);
   border-radius:1.6mm;
   overflow:hidden;
   background:#fff;
 }
-.q-graph svg.wsgraph{display:block;width:100%;height:auto}
-.q-graph.narrow{width:82%;margin-inline:auto}
+.q-graph svg.wsgraph{display:block;width:100%;height:auto;max-height:108mm}
+.q-graph.narrow,.q-graph.compact{width:min(100%,122mm)}
+.q-graph.medium{width:min(100%,146mm)}
+.q-graph.wide{width:100%}
 
 /* ---------- טבלה ---------- */
 .q-table{
   border-collapse:collapse;
-  width:auto;                 /* רוחב לפי התוכן — טבלה צרה אינה נמתחת על כל העמוד */
-  margin:.5mm 0 1mm;
+  width:max-content;
+  max-width:100%;
+  margin:.5mm auto 1mm;
   font-size:10.6pt;
+  table-layout:auto;
 }
 .q-table th,.q-table td{
   border:.3mm solid var(--text-main);
@@ -161,19 +170,40 @@ body{
   min-width:14mm;
   height:8mm;
 }
+.q-table td{unicode-bidi:plaintext}
 .q-table th{background:var(--bg-subtle);font-weight:600;font-size:10pt}
+
+/* מספרים, ביטויים ושברים נשמרים בכיוון מתמטי תקין בתוך RTL */
+.num,.math,.frac{
+  direction:ltr;
+  unicode-bidi:isolate;
+  display:inline-block;
+  font-variant-numeric:tabular-nums;
+}
+.frac{
+  display:inline-grid;
+  grid-template-rows:auto 1px auto;
+  align-items:center;
+  justify-items:center;
+  line-height:1.05;
+  vertical-align:middle;
+  min-width:1.3em;
+}
+.frac::before{content:"";grid-row:2;width:100%;border-top:1px solid currentColor}
+.frac .numr{grid-row:1;padding:0 .12em}
+.frac .den{grid-row:3;padding:0 .12em}
 
 /* ---------- תתי-סעיפים: אות סעיף בלבד ---------- */
 .q-parts{
   list-style:none;
   display:flex;
   flex-direction:column;
-  gap:2.4mm;
+  gap:2.2mm;
 }
 .q-parts > li{
   display:flex;
   flex-direction:column;
-  gap:1.6mm;
+  gap:1.4mm;
 }
 .p-row{
   display:flex;
@@ -190,44 +220,45 @@ body{
   font-size:var(--fs-part);
   line-height:1.5;
   flex:1;
+  min-width:0;
 }
 
-/* ---------- תיבת מענה קנונית („סגנון 5") ----------
-   רקע לבן, מסגרת 1.35px #1f2a44, פינות 8px, גובה 30px,
-   צל תלת-ממדי עדין. הרוחב נגזר מהתשובה הצפויה.            */
+/* ---------- תיבת מענה קנונית — תלת־ממדית עדינה ---------- */
 .abox{
   display:inline-block;
   height:30px;
-  background:#fff;
+  background:linear-gradient(180deg,#fff 0%,#fbfdff 100%);
   border:1.35px solid var(--box-ink);
-  border-radius:8px;
-  box-shadow:1.5px 1.5px 0 rgba(31,42,68,.18);
+  border-radius:7px;
+  box-shadow:0 1px 0 #fff inset,1.8px 2px 0 rgba(31,42,68,.20);
   vertical-align:middle;
+  flex:none;
 }
 .abox.w-xs{width:20mm}
 .abox.w-s{width:30mm}
 .abox.w-m{width:44mm}
 .abox.w-l{width:62mm}
 
-/* השלמה בתוך משפט — קו עדין שעליו התלמיד כותב, לא תיבה */
+/* השלמה בתוך משפט — תמיד באותה שורה כחלק מהמשפט */
 .blank{
   display:inline-block;
-  min-width:11mm;
+  min-width:18mm;
   height:4.6mm;
-  border-bottom:.4mm solid var(--rule);
+  border-bottom:.45mm solid var(--box-ink);
   vertical-align:baseline;
   margin:0 .8mm;
+  white-space:nowrap;
 }
 
-/* תשובה מילולית באותה השורה: הטקסט ברוחבו הטבעי, התיבה ממלאת את השאר */
-.p-text-inline{flex:none;font-size:var(--fs-part);line-height:1.5}
-.abox.fill{flex:1;min-width:28mm;height:26px}
+/* תשובה מילולית באותה השורה */
+.p-text-inline{flex:0 1 auto;font-size:var(--fs-part);line-height:1.5;min-width:0}
+.abox.fill{flex:1 1 35mm;min-width:28mm;max-width:70mm;height:26px}
 
 /* שורת תיבות ממוספרות לסעיף עם מספור פנימי */
 .p-answer.multi{display:flex;flex-wrap:wrap;gap:2mm 8mm}
 .p-answer .multi-item{display:inline-flex;align-items:center;gap:2mm}
 
-/* שורת מענה: תיבה + יחידה, בתחילת השורה (ימין) */
+/* שורת מענה: תיבה + יחידה */
 .p-answer{
   display:flex;
   align-items:center;
@@ -240,22 +271,23 @@ body{
 /* מבנה תשובה מרובת ערכים — מכל LTR כדי שהסדר לא יתהפך */
 .wexpr{
   direction:ltr;
+  unicode-bidi:isolate;
   display:inline-flex;
   align-items:center;
   gap:2mm;
 }
 .wexpr .wop{font-weight:600;font-size:12pt;color:var(--box-ink)}
 
-/* ---------- שורות כתיבה להסבר ----------
-   בלי inline style: המחולל בוחר ans-1 עד ans-6                */
+/* ---------- אזור כתיבה להסבר: משבצות חשבון בלבד, ללא שורות ---------- */
 .ans{
   margin-inline-start:7.6mm;
-  background-image:repeating-linear-gradient(
-      to bottom,
-      transparent 0,
-      transparent calc(var(--write-line) - .3mm),
-      var(--rule) calc(var(--write-line) - .3mm),
-      var(--rule) var(--write-line));
+  border:.25mm solid var(--grid-line);
+  border-radius:1.2mm;
+  background-image:
+    linear-gradient(to right,var(--border-light) .22mm,transparent .22mm),
+    linear-gradient(to bottom,var(--border-light) .22mm,transparent .22mm);
+  background-size:var(--notebook-grid) var(--notebook-grid);
+  background-position:-.2mm -.2mm;
 }
 .ans-1{height:calc(1*var(--write-line))}
 .ans-2{height:calc(2*var(--write-line))}
@@ -264,17 +296,16 @@ body{
 .ans-5{height:calc(5*var(--write-line))}
 .ans-6{height:calc(6*var(--write-line))}
 
-/* ---------- אזור דרך ממוסגר + תשובה סופית משמאל ---------- */
+/* ---------- אזור דרך ממוסגר + תשובה סופית ---------- */
 .work{
   margin-inline-start:7.6mm;
-  border:.3mm dashed var(--grid-line);
+  border:.3mm solid var(--grid-line);
   border-radius:1.6mm;
-  background-image:repeating-linear-gradient(
-      to bottom,
-      transparent 0,
-      transparent calc(var(--write-line) - .3mm),
-      var(--border-light) calc(var(--write-line) - .3mm),
-      var(--border-light) var(--write-line));
+  background-image:
+    linear-gradient(to right,var(--border-light) .22mm,transparent .22mm),
+    linear-gradient(to bottom,var(--border-light) .22mm,transparent .22mm);
+  background-size:var(--notebook-grid) var(--notebook-grid);
+  background-position:-.2mm -.2mm;
 }
 .work-2{height:calc(2*var(--write-line))}
 .work-3{height:calc(3*var(--write-line))}
@@ -287,7 +318,7 @@ body{
   display:flex;
   align-items:center;
   gap:2mm;
-  justify-content:flex-end;      /* ב-RTL: הקצה השמאלי */
+  justify-content:flex-end;
   padding-inline-start:7.6mm;
   font-size:var(--fs-part);
 }
@@ -298,15 +329,15 @@ body{
 .choices{
   list-style:none;
   display:flex;
-  flex-wrap:wrap;                /* אפשרויות קצרות מסתדרות בכמה טורים — חוסך שורות */
+  flex-wrap:wrap;
   gap:1.6mm 8mm;
   padding-inline-start:7.6mm;
 }
 .choices li{display:flex;align-items:center;gap:2.4mm;font-size:var(--fs-part)}
 
-/* שורת שאלה + תיבה באותה שורה: התיבה צמודה לטקסט, לא בקצה העמוד */
-.p-row-inline{align-items:center;gap:2.4mm}
-.p-row-inline .p-text{flex:0 1 auto}
+/* שורת שאלה + תיבה באותה שורה */
+.p-row-inline{align-items:center;gap:2.4mm;flex-wrap:nowrap}
+.p-row-inline .p-text{flex:0 1 auto;min-width:0}
 .p-row-inline .ans-lbl{font-weight:600;white-space:nowrap}
 .p-row .abox,.p-row .wexpr{align-self:center}
 .choices .box{
@@ -317,7 +348,7 @@ body{
   border-radius:.8mm;
 }
 
-/* היגדים על הגרף: התלמיד כותב נכון / לא נכון / אי אפשר לדעת על הקו */
+/* היגדים על הגרף */
 .stmts{
   display:flex;
   flex-direction:column;
@@ -338,8 +369,8 @@ body{
 .a4-page > .gz-footer{
   flex:0 0 auto;
   margin-top:auto;
-  padding-top:2.2mm;                       /* הכיתוב יורד מעט — ממורכז מול תחתית הדף */
-  border-top:2px solid #1e40af;            /* קו כחול כהה לכל רוחב התוכן */
+  padding-top:2.2mm;
+  border-top:2px solid #1e40af;
   text-align:center;
   line-height:1.3;
 }
