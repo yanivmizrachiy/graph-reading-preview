@@ -1,18 +1,18 @@
 (() => {
   'use strict';
 
-  const RELEASE_VERSION = 'graph-reading-20260902-auto-counter-print-menu';
+  const RELEASE_VERSION = 'graph-reading-20260902-single-html-viewer';
   const MANIFEST_URL = `meta/graph-reading-workbook.json?v=${RELEASE_VERSION}`;
+  const BOOK_HTML = `מאגר-מלא.html?v=${RELEASE_VERSION}`;
   const params = new URLSearchParams(location.search);
 
   let manifest;
   let page = Math.max(1, Number(params.get('page')) || 1);
-  let loadTimer = null;
   let bookReady = false;
   let scrollRaf = null;
 
   const $ = (id) => document.getElementById(id);
-  const frame = $('pdfFrame');
+  const frame = $('bookFrame');
   const panel = $('viewerPanel');
   const pageInput = $('pageNumber');
   const pageCount = $('pageCount');
@@ -31,18 +31,9 @@
     return Math.min(total, Math.max(1, Number(value) || 1));
   }
 
-  async function assertLocalPdf(path) {
-    const response = await fetch(path, { method: 'HEAD', cache: 'no-store' });
-    if (!response.ok) throw new Error(`Local PDF HTTP ${response.status}`);
-  }
-
   function versionedAssetUrl(file) {
     const separator = file.path.includes('?') ? '&' : '?';
     return `${file.path}${separator}v=${file.sha256.slice(0, 12)}-${RELEASE_VERSION}`;
-  }
-
-  function pdfViewUrl(file) {
-    return `${versionedAssetUrl(file)}#toolbar=0&navpanes=0&scrollbar=0&page=${page}&zoom=page-width`;
   }
 
   function printUrl(file) {
@@ -84,10 +75,6 @@
     window.open(printUrl(manifest.files[kind]), '_blank', 'noopener,noreferrer');
   }
 
-  const usesHtmlBook = /iPad|iPhone|iPod|Android/i.test(navigator.userAgent)
-    || (navigator.maxTouchPoints > 1 && /Macintosh/.test(navigator.userAgent));
-  const BOOK_HTML = 'מאגר-מלא.html';
-
   function bookDoc() {
     try { return frame.contentDocument; } catch { return null; }
   }
@@ -96,16 +83,40 @@
     try { return frame.contentWindow; } catch { return null; }
   }
 
-  function applyMobileBookLayout() {
+  function bookPages() {
     const doc = bookDoc();
-    if (!doc || !doc.head) return;
+    return doc ? [...doc.querySelectorAll('.a4-page')] : [];
+  }
 
-    let style = doc.getElementById('gzMobileContinuousPages');
+  function validateBook() {
+    const doc = bookDoc();
+    const pages = bookPages();
+    if (!doc?.head || pages.length !== manifest.pageCount) {
+      console.error('[graph-reading:book-contract]', {
+        expectedPages: manifest.pageCount,
+        actualPages: pages.length
+      });
+      bookReady = false;
+      showFallback(true);
+      return false;
+    }
+    return true;
+  }
+
+  function applyBookLayout() {
+    const doc = bookDoc();
+    if (!doc?.head) return;
+
+    let style = doc.getElementById('gzContinuousPages');
     if (!style) {
       style = doc.createElement('style');
-      style.id = 'gzMobileContinuousPages';
+      style.id = 'gzContinuousPages';
       style.textContent = `
-        html, body { background: #fff !important; }
+        html, body {
+          margin: 0 !important;
+          padding: 0 !important;
+          background: #fff !important;
+        }
         body { gap: 0 !important; }
         .a4-page {
           margin: 0 auto !important;
@@ -121,34 +132,29 @@
 
   function fitBook() {
     const doc = bookDoc();
-    if (!doc || !doc.documentElement) return;
+    if (!doc?.documentElement) return;
     const sheetPx = 210 * (96 / 25.4);
     const availableWidth = frame.clientWidth || sheetPx;
-    const scale = Math.max(0.15, availableWidth / sheetPx);
+    const scale = Math.min(1, Math.max(0.15, availableWidth / sheetPx));
     doc.documentElement.style.zoom = String(scale);
   }
 
   function showBookPage() {
-    const doc = bookDoc();
-    if (!doc) return;
-    const sheets = doc.querySelectorAll('.a4-page');
-    const target = sheets[clampPage(page) - 1];
+    const pages = bookPages();
+    const target = pages[clampPage(page) - 1];
     if (target) target.scrollIntoView({ block: 'start' });
   }
 
   function updatePageFromBookScroll() {
-    const doc = bookDoc();
     const win = bookWindow();
-    if (!doc || !win) return;
-
-    const sheets = [...doc.querySelectorAll('.a4-page')];
-    if (!sheets.length) return;
+    const pages = bookPages();
+    if (!win || !pages.length) return;
 
     const marker = Math.max(1, win.innerHeight * 0.35);
     let bestIndex = 0;
     let bestDistance = Infinity;
 
-    sheets.forEach((sheet, index) => {
+    pages.forEach((sheet, index) => {
       const rect = sheet.getBoundingClientRect();
       if (rect.top <= marker && rect.bottom > marker) {
         bestIndex = index;
@@ -185,7 +191,8 @@
     }, { passive: true });
   }
 
-  function configureDownload(file) {
+  function configureDownload() {
+    const file = manifest.files.color;
     const href = versionedAssetUrl(file);
     downloadButton.href = href;
     downloadButton.setAttribute('download', file.filename);
@@ -193,65 +200,31 @@
     fallbackDownload.setAttribute('download', file.filename);
   }
 
-  function renderHtmlBook(file) {
+  function renderBook() {
     syncControls();
     syncUrl();
-    configureDownload(file);
+    configureDownload();
     showFallback(false);
 
     if (!bookReady) {
-      frame.src = BOOK_HTML;
+      if (frame.getAttribute('src') !== BOOK_HTML) frame.src = BOOK_HTML;
       return;
     }
 
-    applyMobileBookLayout();
+    if (!validateBook()) return;
+    applyBookLayout();
     fitBook();
     showBookPage();
     installBookScrollTracking();
-  }
-
-  async function render({ verifySource = false } = {}) {
-    const file = manifest.files.color;
-
-    if (usesHtmlBook) {
-      renderHtmlBook(file);
-      return;
-    }
-
-    syncControls();
-    syncUrl();
-    configureDownload(file);
-    showFallback(false);
-
-    const localUrl = versionedAssetUrl(file);
-    const previewUrl = pdfViewUrl(file);
-
-    try {
-      if (verifySource) await assertLocalPdf(localUrl);
-      frame.src = previewUrl;
-
-      clearTimeout(loadTimer);
-      loadTimer = setTimeout(() => showFallback(true), 14000);
-    } catch (error) {
-      console.error('[graph-reading:local-pdf]', error);
-      clearTimeout(loadTimer);
-      showFallback(true);
-    }
   }
 
   function setPage(next) {
     const normalized = clampPage(next);
     if (normalized === page) return;
     page = normalized;
-
-    if (usesHtmlBook && bookReady) {
-      syncControls();
-      syncUrl();
-      showBookPage();
-      return;
-    }
-
-    render();
+    syncControls();
+    syncUrl();
+    if (bookReady) showBookPage();
   }
 
   async function loadManifest() {
@@ -264,20 +237,18 @@
   }
 
   frame.addEventListener('load', () => {
-    clearTimeout(loadTimer);
-    if (usesHtmlBook) {
-      bookReady = true;
-      applyMobileBookLayout();
-      fitBook();
-      showBookPage();
-      installBookScrollTracking();
-      requestAnimationFrame(updatePageFromBookScroll);
-    }
+    bookReady = true;
+    if (!manifest || !validateBook()) return;
+    applyBookLayout();
+    fitBook();
+    showBookPage();
+    installBookScrollTracking();
+    requestAnimationFrame(updatePageFromBookScroll);
     showFallback(false);
   });
 
   frame.addEventListener('error', () => {
-    clearTimeout(loadTimer);
+    bookReady = false;
     showFallback(true);
   });
 
@@ -311,19 +282,17 @@
   });
 
   window.addEventListener('resize', () => {
-    if (usesHtmlBook && bookReady) {
-      fitBook();
-      requestAnimationFrame(updatePageFromBookScroll);
-    }
+    if (!bookReady) return;
+    fitBook();
+    requestAnimationFrame(updatePageFromBookScroll);
   });
 
   window.addEventListener('orientationchange', () => {
     setTimeout(() => {
-      if (usesHtmlBook && bookReady) {
-        fitBook();
-        showBookPage();
-        updatePageFromBookScroll();
-      }
+      if (!bookReady) return;
+      fitBook();
+      showBookPage();
+      updatePageFromBookScroll();
     }, 250);
   });
 
@@ -341,7 +310,7 @@
     try {
       manifest = await loadManifest();
       page = clampPage(page);
-      await render({ verifySource: true });
+      renderBook();
     } catch (error) {
       console.error('[graph-reading]', error);
       showFallback(true);
