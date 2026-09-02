@@ -6,59 +6,26 @@
   <meta http-equiv="Cache-Control" content="no-store, no-cache, must-revalidate, max-age=0" />
   <meta http-equiv="Pragma" content="no-cache" />
   <meta http-equiv="Expires" content="0" />
-  <meta name="graph-reading-release" content="graph-reading-20260902-mobile-continuous" />
+  <meta name="graph-reading-release" content="graph-reading-20260902-clean-viewer" />
   <meta name="theme-color" content="#0f2747" />
-  <title>קריאת גרפים — חוברת דיגיטלית</title>
-  <meta name="description" content="קריאת גרפים — חוברת עבודה להדפסה: דפדוף, הורדה והדפסה בצבע או בשחור־לבן." />
+  <title>קריאת גרפים</title>
+  <meta name="description" content="חוברת עבודה בקריאת גרפים — דפדוף, הורדה והדפסה בצבע או בשחור־לבן." />
   <link rel="stylesheet" href="assets/fonts/rubik.css" />
-  <link rel="stylesheet" href="graph-reading-workbook.css" />
+  <link rel="stylesheet" href="graph-reading-workbook.css?v=graph-reading-20260902-clean-viewer" />
 </head>
 <body>
-  <header class="topbar">
-    <a class="brand" href="דפים.html" aria-label="מעבר לתצוגת הדפים">
-      <span>
-        <strong>קריאת גרפים</strong>
-        <small>חוברת דיגיטלית · 165 עמודים</small>
-      </span>
-    </a>
-
-    <nav class="actions" aria-label="פעולות החוברת">
-      <div class="mode-switch" role="group" aria-label="בחירת גרסה">
-        <button id="colorMode" class="mode is-active" type="button" aria-pressed="true">צבעוני</button>
-        <button id="bwMode" class="mode" type="button" aria-pressed="false">שחור־לבן</button>
-      </div>
-      <a id="downloadButton" class="button primary" href="#" download>⬇ הורדת PDF</a>
-      <a id="openButton" class="button" href="#" target="_blank" rel="noopener">↗ פתיחה והדפסה</a>
-      <button id="fullscreenButton" class="button" type="button">⛶ מסך מלא</button>
-    </nav>
+  <header class="action-bar" aria-label="פעולות החוברת">
+    <div class="mode-switch" role="group" aria-label="בחירת גרסה">
+      <button id="colorMode" class="mode is-active" type="button" aria-pressed="true">צבעוני</button>
+      <button id="bwMode" class="mode" type="button" aria-pressed="false">שחור־לבן</button>
+    </div>
+    <a id="downloadButton" class="button primary" href="#" download>הורדת PDF</a>
+    <a id="openButton" class="button" href="#" target="_blank" rel="noopener">פתיחה והדפסה</a>
+    <button id="fullscreenButton" class="button" type="button">מסך מלא</button>
   </header>
 
   <main class="workbook-shell">
-    <section class="intro" aria-labelledby="workbookTitle">
-      <div>
-        <p class="eyebrow">דפי עבודה במתמטיקה · חוברת להוראה ולהדפסה</p>
-        <h1 id="workbookTitle">קריאת גרפים — עבודה על גרפים מחיי היום-יום</h1>
-        <p>דפדוף נוח בין 165 עמודי A4, בחירה בין גרסה צבעונית לשחור־לבן, הורדה והדפסה ישירות מהחוברת.</p>
-      </div>
-      <div class="legend" aria-label="פרטי החוברת">
-        <span><b>165</b> עמודים</span>
-        <span><b>A4</b> להדפסה</span>
-        <span><b>2</b> גרסאות</span>
-      </div>
-    </section>
-
     <section id="viewerPanel" class="viewer-panel" aria-label="תצוגת החוברת">
-      <div class="viewer-head">
-        <div>
-          <strong id="viewerModeLabel">גרסה צבעונית</strong>
-          <span id="viewerHelp">השתמשו בחצים, במספר העמוד או במקשי המקלדת לדפדוף.</span>
-        </div>
-        <div class="viewer-state">
-          <span class="source-badge" id="sourceBadge">בודק מקור…</span>
-          <span class="status" id="status" role="status" aria-live="polite">טוען…</span>
-        </div>
-      </div>
-
       <div class="page-toolbar" role="group" aria-label="ניווט בעמודי החוברת">
         <button id="prevPage" class="page-button" type="button">◄ הקודם</button>
         <label class="page-jump" for="pageNumber">
@@ -67,23 +34,11 @@
           <span>מתוך <b id="pageCount">165</b></span>
         </label>
         <button id="nextPage" class="page-button" type="button">הבא ►</button>
-        <label class="zoom-control" for="zoomMode">
-          <span>תצוגה</span>
-          <select id="zoomMode">
-            <option value="page-width">רוחב העמוד</option>
-            <option value="page-fit">עמוד מלא</option>
-            <option value="100">100%</option>
-            <option value="125">125%</option>
-            <option value="150">150%</option>
-          </select>
-        </label>
       </div>
 
       <iframe id="pdfFrame" title="קריאת גרפים — חוברת עבודה" loading="eager" allow="fullscreen"></iframe>
 
       <div id="viewerFallback" class="viewer-fallback" hidden>
-        <strong>לא ניתן להציג את ה־PDF בתוך החלון.</strong>
-        <span>אפשר לפתוח אותו בטאב חדש או להוריד אותו ישירות.</span>
         <div>
           <a id="fallbackOpen" class="button primary" href="#" target="_blank" rel="noopener">פתיחת החוברת</a>
           <a id="fallbackDownload" class="button" href="#" download>הורדת PDF</a>
@@ -97,6 +52,6 @@
     <span>הדרכה במחוז ירושלים והעיר ירושלים - מנח״י, בהובלת איילת קריספין</span>
   </footer>
 
-  <script src="graph-reading-workbook.js?v=graph-reading-20260902-mobile-continuous"></script>
+  <script src="graph-reading-workbook.js?v=graph-reading-20260902-clean-viewer"></script>
 </body>
 </html>
