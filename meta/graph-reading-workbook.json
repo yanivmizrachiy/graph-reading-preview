@@ -10,15 +10,15 @@
       "label": "גרסה צבעונית",
       "filename": "graph-reading-color.pdf",
       "path": "assets/pdf/graph-reading-color.pdf",
-      "bytes": 8703768,
-      "sha256": "2ce39dd27aa6e4f9e97003a69f3a16402a86f1b961e2ac11cc280d00b951056b"
+      "bytes": 8717417,
+      "sha256": "37e86320e6e7a49e1e49424b488a0f08aded27c4ac852b78d24c44c76dccca91"
     },
     "bw": {
       "label": "גרסה בשחור־לבן",
       "filename": "graph-reading-bw.pdf",
       "path": "assets/pdf/graph-reading-bw.pdf",
-      "bytes": 8289623,
-      "sha256": "5119d3df0b6d83d1b3f754af9b9329424fe6d1c40dea01e859bdb04e2f7fa93a"
+      "bytes": 8303249,
+      "sha256": "53418b1a3ec6d93e86dda291ad14078a2e0d793f2c0ce60ab175a5351af8398d"
     }
   },
   "credits": [

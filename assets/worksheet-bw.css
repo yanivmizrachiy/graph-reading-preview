@@ -28,8 +28,14 @@ svg.wsgraph [stroke="#166534"]{stroke:#7a7a7a !important}
 svg.wsgraph [fill="#166534"]{fill:#7a7a7a !important}
 svg.wsgraph [stroke="#b45309"]{stroke:#4a4a4a !important}
 svg.wsgraph [fill="#b45309"]{fill:#4a4a4a !important}
+svg.wsgraph [stroke="#6d28d9"]{stroke:#6a6a6a !important}
+svg.wsgraph [fill="#6d28d9"]{fill:#6a6a6a !important}
+svg.wsgraph [stroke="#0e7490"]{stroke:#3f3f3f !important}
+svg.wsgraph [fill="#0e7490"]{fill:#3f3f3f !important}
 svg.wsgraph text[style*="fill:#b45309"]{fill:#4a4a4a !important}
 svg.wsgraph text[style*="fill:#1d4ed8"]{fill:#2f2f2f !important}
+svg.wsgraph text[style*="fill:#6d28d9"]{fill:#6a6a6a !important}
+svg.wsgraph text[style*="fill:#0e7490"]{fill:#3f3f3f !important}
 
 /* התצלומים אינם מסוננים כאן: הבנייה מחליפה אותם בקבצי גווני-אפור
    (assets/images/bw/), ולכן הדף נשאר וקטורי וה-PDF אינו תופח. */
