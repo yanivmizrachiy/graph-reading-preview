@@ -1,7 +1,7 @@
 (() => {
   'use strict';
 
-  const RELEASE_VERSION = 'graph-reading-20260902';
+  const RELEASE_VERSION = 'graph-reading-20260902-mobile-continuous';
   const MANIFEST_URL = `meta/graph-reading-workbook.json?v=${RELEASE_VERSION}`;
   const params = new URLSearchParams(location.search);
   let manifest;
@@ -55,9 +55,6 @@
   }
 
   function fragmentUrl(base) {
-    // toolbar/navpanes/scrollbar=0 מסתירים את סרגל ה-PDF של הדפדפן ואת
-    // רצועת הממוזערות, כך שהחוברת נראית כספר ולא כקובץ גולמי. הדפדוף,
-    // הזום, ההדפסה וההורדה נעשים מהכפתורים שלנו.
     const fragment = new URLSearchParams({ page: String(page), zoom });
     return `${base}#toolbar=0&navpanes=0&scrollbar=0&${fragment.toString()}`;
   }
@@ -92,10 +89,6 @@
     frame.hidden = show;
   }
 
-  // iOS ואנדרואיד אינם מדפדפים PDF בתוך iframe: ספארי מציג עמוד אחד בלבד
-  // ומתעלם מ-#page, וכרום באנדרואיד נוטה להוריד את הקובץ במקום להציג אותו.
-  // בטלפון ובטאבלט מוצגים לכן עמודי ה-HTML עצמם, באותה מסגרת ומאותם
-  // כפתורים. ההורדה וההדפסה ממשיכות להשתמש ב-PDF בכל מכשיר.
   const usesHtmlBook = /iPad|iPhone|iPod|Android/i.test(navigator.userAgent)
     || (navigator.maxTouchPoints > 1 && /Macintosh/.test(navigator.userAgent));
   const BOOK_HTML = 'מאגר-מלא.html';
@@ -105,10 +98,37 @@
     try { return frame.contentDocument; } catch { return null; }
   }
 
+  function applyMobileBookLayout() {
+    const doc = bookDoc();
+    if (!doc || !doc.head) return;
+
+    let style = doc.getElementById('gzMobileContinuousPages');
+    if (!style) {
+      style = doc.createElement('style');
+      style.id = 'gzMobileContinuousPages';
+      style.textContent = `
+        html, body {
+          background: #fff !important;
+        }
+        body {
+          gap: 0 !important;
+        }
+        .a4-page {
+          margin: 0 auto !important;
+          box-shadow: none !important;
+        }
+        .a4-page + .a4-page {
+          border-top: 3px solid #0f2747 !important;
+        }
+      `;
+      doc.head.appendChild(style);
+    }
+  }
+
   function fitBook() {
     const doc = bookDoc();
     if (!doc || !doc.documentElement) return;
-    const sheetPx = 210 * (96 / 25.4);            // רוחב A4 בפיקסלים
+    const sheetPx = 210 * (96 / 25.4);
     const avail = frame.clientWidth || sheetPx;
     let scale = avail / sheetPx;
     if (zoom === 'page-fit') {
@@ -171,6 +191,7 @@
       frame.src = BOOK_HTML;
       return;
     }
+    applyMobileBookLayout();
     applyBookMode();
     fitBook();
     showBookPage();
@@ -243,6 +264,7 @@
     clearTimeout(loadTimer);
     if (usesHtmlBook) {
       bookReady = true;
+      applyMobileBookLayout();
       applyBookMode();
       fitBook();
       showBookPage();
@@ -301,7 +323,7 @@
       page = clampPage(page);
       await render({ verifySource: true });
     } catch (error) {
-      console.error('[algebra-z]', error);
+      console.error('[graph-reading]', error);
       setStatus('שגיאה בטעינת נתוני החוברת', 'error');
       sourceBadge.textContent = 'לא זמין';
       sourceBadge.classList.add('is-fallback');
