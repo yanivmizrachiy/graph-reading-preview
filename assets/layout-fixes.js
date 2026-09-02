@@ -30,6 +30,11 @@
     .page-redesigned .stmts{gap:1.35mm}
     .page-redesigned .choices{gap:1.2mm 6mm}
 
+    .page-6-flow .q-parts>li{padding:1.4mm 0;border-bottom:.25mm solid #e2e8f0}
+    .page-6-flow .q-parts>li:last-child{border-bottom:0}
+    .page-6-flow .p-row{align-items:flex-start}
+    .page-6-flow .p-answer{padding-inline-start:7.6mm;margin-top:1mm}
+
     .page-tight .ws-body{gap:3.6mm}
     .page-tight .q{gap:2mm}
     .page-tight .q-parts{gap:1.7mm}
@@ -38,7 +43,6 @@
   document.head.appendChild(style);
 
   function normalizeNegativeNumbers() {
-    // תאי טבלה וטקסטים ב-SVG: מבודדים מספר שלילי מכיוון ה-RTL.
     $$('td, th').forEach(cell => {
       const raw = cell.textContent.trim();
       let m = raw.match(/^(\d+(?:\.\d+)?)-$/);
@@ -71,7 +75,7 @@
     nodes.forEach(node => {
       const parent = node.parentElement;
       if (!parent || parent.closest('svg,script,style')) return;
-      let t = node.nodeValue;
+      const t = node.nodeValue;
       const next = t
         .replace(/(^|[\s(=,:;])-(\d+(?:\.\d+)?)(?=$|[\s),.;])/g, '$1−$2')
         .replace(/(^|[\s(=,:;])(\d+(?:\.\d+)?)-(?=$|[\s),.;])/g, '$1−$2');
@@ -130,9 +134,7 @@
     $$('.p-row-inline').forEach(row => {
       const text = row.textContent.replace(/\s+/g, ' ').trim();
       if (!row.querySelector('.abox,.blank')) return;
-      if (/השלימו|בקצב של|מייצג|גדל ב-|קטן ב-/.test(text)) {
-        row.classList.add('sentence-completion');
-      }
+      if (/השלימו|בקצב של|מייצג|גדל ב-|קטן ב-/.test(text)) row.classList.add('sentence-completion');
     });
   }
 
@@ -147,6 +149,20 @@
     row.className = 'visual-row';
     table.before(row);
     row.append(graph, table);
+  }
+
+  function moveInlineAnswerBelow(li) {
+    const row = li.querySelector(':scope > .p-row');
+    if (!row || !row.classList.contains('p-row-inline')) return;
+    const answerNodes = Array.from(row.children).filter(el =>
+      el.matches('.ans-lbl,.abox,.unit,.wexpr')
+    );
+    if (!answerNodes.length) return;
+    row.classList.remove('p-row-inline', 'sentence-completion');
+    const answer = document.createElement('div');
+    answer.className = 'p-answer';
+    answerNodes.forEach(node => answer.append(node));
+    row.after(answer);
   }
 
   function redesignPage3() {
@@ -184,6 +200,17 @@
     });
   }
 
+  function redesignPage6() {
+    const page = getPage(6);
+    if (!page) return;
+    page.classList.add('page-redesigned', 'page-6-flow');
+    const stem = page.querySelector('.q-stem');
+    if (stem) stem.textContent = 'עיינו בגרף וענו על הסעיפים הבאים.';
+    const parts = page.querySelector('.q-parts');
+    if (parts) Array.from(parts.children).forEach(moveInlineAnswerBelow);
+    page.querySelector('.q-graph')?.classList.add('graph-medium');
+  }
+
   function redesignPage14() {
     const page = getPage(14);
     if (!page) return;
@@ -210,12 +237,8 @@
     const parts = q.querySelector('.q-parts');
     if (!parts) return;
     parts.innerHTML = `
-      <li>
-        <div class="p-row"><span class="p-mark">א.</span><span class="p-text">השלימו את הטבלה לפי הנתונים שבגרף.</span></div>
-      </li>
-      <li>
-        <div class="p-row p-row-inline"><span class="p-mark">ב.</span><span class="p-text">כמה משלמים עבור 2 ק״ג של משקל עודף?</span><span class="abox w-xs"></span><span class="unit">₪</span></div>
-      </li>
+      <li><div class="p-row"><span class="p-mark">א.</span><span class="p-text">השלימו את הטבלה לפי הנתונים שבגרף.</span></div></li>
+      <li><div class="p-row p-row-inline"><span class="p-mark">ב.</span><span class="p-text">כמה משלמים עבור 2 ק״ג של משקל עודף?</span><span class="abox w-xs"></span><span class="unit">₪</span></div></li>
       <li>
         <div class="p-row"><span class="p-mark">ג.</span><span class="p-text">קבעו לגבי כל היגד אם הוא נכון או לא נכון.</span></div>
         <div class="stmts">
@@ -233,17 +256,14 @@
           <li><span class="box"></span><span>רק הקילוגרם הראשון מחויב בתשלום.</span></li>
         </ul>
       </li>
-      <li>
-        <div class="p-row p-row-inline"><span class="p-mark">ה.</span><span class="p-text">בהנחה שהתשלום יחסי גם לחלקי ק״ג, כמה ישלמו עבור 1.5 ק״ג משקל עודף?</span><span class="abox w-xs"></span><span class="unit">₪</span></div>
-      </li>`;
+      <li><div class="p-row p-row-inline"><span class="p-mark">ה.</span><span class="p-text">בהנחה שהתשלום יחסי גם לחלקי ק״ג, כמה ישלמו עבור 1.5 ק״ג משקל עודף?</span><span class="abox w-xs"></span><span class="unit">₪</span></div></li>`;
   }
 
   function fitOverflowingPages() {
     requestAnimationFrame(() => {
       $$('.a4-page').forEach(page => {
         const body = page.querySelector('.ws-body');
-        if (!body) return;
-        if (body.scrollHeight > body.clientHeight + 2) page.classList.add('page-tight');
+        if (body && body.scrollHeight > body.clientHeight + 2) page.classList.add('page-tight');
       });
     });
   }
@@ -254,6 +274,7 @@
   normalizeInlineCompletions();
   redesignPage3();
   redesignPage4And5();
+  redesignPage6();
   redesignPage14();
   redesignPage27();
   fitOverflowingPages();
