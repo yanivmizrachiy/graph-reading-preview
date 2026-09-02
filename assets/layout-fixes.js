@@ -29,6 +29,10 @@
     .page-redesigned .q-parts>li{gap:1.25mm}
     .page-redesigned .stmts{gap:1.35mm}
     .page-redesigned .choices{gap:1.2mm 6mm}
+    .opening-page .q-parts{gap:1.7mm}
+    .opening-page .q-parts>li{padding:.65mm 0}
+    .opening-page .choices{padding-inline-start:7.6mm}
+    .opening-page .work{margin-top:.5mm}
 
     .page-6-flow .q-parts>li{padding:1.4mm 0;border-bottom:.25mm solid #e2e8f0}
     .page-6-flow .q-parts>li:last-child{border-bottom:0}
@@ -154,15 +158,56 @@
   function moveInlineAnswerBelow(li) {
     const row = li.querySelector(':scope > .p-row');
     if (!row || !row.classList.contains('p-row-inline')) return;
-    const answerNodes = Array.from(row.children).filter(el =>
-      el.matches('.ans-lbl,.abox,.unit,.wexpr')
-    );
+    const answerNodes = Array.from(row.children).filter(el => el.matches('.ans-lbl,.abox,.unit,.wexpr'));
     if (!answerNodes.length) return;
     row.classList.remove('p-row-inline', 'sentence-completion');
     const answer = document.createElement('div');
     answer.className = 'p-answer';
     answerNodes.forEach(node => answer.append(node));
     row.after(answer);
+  }
+
+  function redesignOpeningPages() {
+    const page1 = getPage(1);
+    if (page1) {
+      page1.classList.add('page-redesigned', 'opening-page');
+      const parts = page1.querySelector('.q-parts');
+      if (parts) {
+        parts.innerHTML = `
+          <li><div class="p-row p-row-inline"><span class="p-mark">א.</span><span class="p-text">מה היה אחוז שחקני הטלפון בקרב השחקנים בדרגת כסף בשנת 2024?</span><span class="abox w-xs"></span><span class="unit">%</span></div></li>
+          <li><div class="p-row p-row-inline"><span class="p-mark">ב.</span><span class="p-text">באיזו דרגה היה אחוז שחקני הטלפון בשנת 2024 הגבוה ביותר?</span><span class="abox w-m"></span></div></li>
+          <li><div class="p-row sentence-completion"><span class="p-mark">ג.</span><span class="p-text">השלימו: ציר X מייצג</span><span class="abox w-m"></span><span class="p-text">וציר Y מייצג</span><span class="abox w-m"></span></div></li>
+          <li>
+            <div class="p-row"><span class="p-mark">ד.</span><span class="p-text">התבוננו בגרף של שחקני הטלפון בשנת 2024. בין דרגת כסף לדרגת זהב אחוז השחקנים:</span></div>
+            <ul class="choices"><li><span class="box"></span><span>עלה</span></li><li><span class="box"></span><span>ירד</span></li><li><span class="box"></span><span>לא השתנה</span></li></ul>
+          </li>
+          <li><div class="p-row p-row-inline"><span class="p-mark">ה.</span><span class="p-text">בחרו דרגה אחת ורשמו את אחוז שחקני הטלפון בשנת 2024 באותה דרגה.</span><span class="abox w-m"></span><span class="abox w-xs"></span><span class="unit">%</span></div></li>`;
+      }
+    }
+
+    const page2 = getPage(2);
+    if (page2) {
+      page2.classList.add('page-redesigned', 'opening-page');
+      const parts = page2.querySelector('.q-parts');
+      if (parts) {
+        parts.innerHTML = `
+          <li><div class="p-row p-row-inline"><span class="p-mark">א.</span><span class="p-text">באיזה יום בשבוע אחוז הסוללה של השעון החכם היה 35%?</span><span class="abox w-m"></span></div></li>
+          <li><div class="p-row p-row-inline"><span class="p-mark">ב.</span><span class="p-text">באיזה יום היה אחוז הסוללה של Galaxy הגבוה ביותר?</span><span class="abox w-m"></span></div></li>
+          <li>
+            <div class="p-row"><span class="p-mark">ג.</span><span class="p-text">סמנו את כל המכשירים שאחוז הסוללה שלהם עלה בין יום ראשון ליום שני. ייתכן שיש יותר מתשובה אחת.</span></div>
+            <ul class="choices"><li><span class="box"></span><span>iPhone</span></li><li><span class="box"></span><span>Galaxy</span></li><li><span class="box"></span><span>שעון חכם</span></li><li><span class="box"></span><span>AirPods</span></li></ul>
+          </li>
+          <li>
+            <div class="p-row"><span class="p-mark">ד.</span><span class="p-text">קבעו לגבי כל היגד אם הוא נכון או לא נכון לפי הגרף.</span></div>
+            <div class="stmts">
+              <div class="stmt"><span class="stmt-text">ביום שבו השעון החכם היה על 35%, ל־Galaxy היה אחוז סוללה גבוה יותר.</span><span class="blank wide"></span></div>
+              <div class="stmt"><span class="stmt-text">iPhone הגיע לאותו אחוז סוללה בשני ימים שונים לפחות.</span><span class="blank wide"></span></div>
+              <div class="stmt"><span class="stmt-text">AirPods היה המכשיר בעל אחוז הסוללה הגבוה ביותר לפחות באחד הימים.</span><span class="blank wide"></span></div>
+            </div>
+          </li>
+          <li><div class="p-row"><span class="p-mark">ה.</span><span class="p-text">בחרו יום אחד והשוו בו בין Galaxy ל־iPhone: מי מהם היה עם אחוז סוללה גבוה יותר ובכמה נקודות אחוז?</span></div><div class="work work-2"></div></li>`;
+      }
+    }
   }
 
   function redesignPage3() {
@@ -173,19 +218,12 @@
     if (!parts) return;
     const probability = Array.from(parts.children).find(li => li.textContent.includes('הסתברות'));
     if (probability) {
-      probability.innerHTML = `
-        <div class="p-row p-row-inline">
-          <span class="p-mark">ג.</span>
-          <span class="p-text">איזה אמצעי תחבורה נבחר על ידי האחוז הגדול ביותר של התלמידים?</span>
-          <span class="abox w-m"></span>
-        </div>`;
+      probability.innerHTML = `<div class="p-row p-row-inline"><span class="p-mark">ג.</span><span class="p-text">איזה אמצעי תחבורה נבחר על ידי האחוז הגדול ביותר של התלמידים?</span><span class="abox w-m"></span></div>`;
     }
     if (!Array.from(parts.children).some(li => li.dataset.addedComparison === '1')) {
       const li = document.createElement('li');
       li.dataset.addedComparison = '1';
-      li.innerHTML = `
-        <div class="p-row"><span class="p-mark">ד.</span><span class="p-text">בחרו שני אמצעי תחבורה מן הגרף וכתבו משפט אחד שמשווה ביניהם על סמך הנתונים.</span></div>
-        <div class="work work-2"></div>`;
+      li.innerHTML = `<div class="p-row"><span class="p-mark">ד.</span><span class="p-text">בחרו שני אמצעי תחבורה מן הגרף וכתבו משפט אחד שמשווה ביניהם על סמך הנתונים.</span></div><div class="work work-2"></div>`;
       parts.append(li);
     }
     page.querySelector('.q-graph')?.classList.add('graph-medium');
@@ -219,11 +257,7 @@
     if (!row) return;
     const mark = row.querySelector('.p-mark')?.textContent || 'ב.';
     row.classList.add('sentence-completion');
-    row.innerHTML = `
-      <span class="p-mark">${mark}</span>
-      <span class="p-text">השלימו: רוקנו את המים מהמכל בקצב של</span>
-      <span class="abox w-xs" aria-label="מקום לתשובה"></span>
-      <span class="unit">מ״ק בדקה.</span>`;
+    row.innerHTML = `<span class="p-mark">${mark}</span><span class="p-text">השלימו: רוקנו את המים מהמכל בקצב של</span><span class="abox w-xs" aria-label="מקום לתשובה"></span><span class="unit">מ״ק בדקה.</span>`;
   }
 
   function redesignPage27() {
@@ -239,23 +273,8 @@
     parts.innerHTML = `
       <li><div class="p-row"><span class="p-mark">א.</span><span class="p-text">השלימו את הטבלה לפי הנתונים שבגרף.</span></div></li>
       <li><div class="p-row p-row-inline"><span class="p-mark">ב.</span><span class="p-text">כמה משלמים עבור 2 ק״ג של משקל עודף?</span><span class="abox w-xs"></span><span class="unit">₪</span></div></li>
-      <li>
-        <div class="p-row"><span class="p-mark">ג.</span><span class="p-text">קבעו לגבי כל היגד אם הוא נכון או לא נכון.</span></div>
-        <div class="stmts">
-          <div class="stmt"><span class="stmt-text">על כל ק״ג נוסף התשלום גדל באותו סכום.</span><span class="blank wide"></span></div>
-          <div class="stmt"><span class="stmt-text">התשלום עבור 2 ק״ג הוא פי שניים מהתשלום עבור 1 ק״ג.</span><span class="blank wide"></span></div>
-          <div class="stmt"><span class="stmt-text">כאשר אין משקל עודף, אין תשלום נוסף.</span><span class="blank wide"></span></div>
-        </div>
-      </li>
-      <li>
-        <div class="p-row"><span class="p-mark">ד.</span><span class="p-text">איזה משפט מתאר נכון את הקשר בין המשקל העודף לתשלום?</span></div>
-        <ul class="choices">
-          <li><span class="box"></span><span>כל ק״ג נוסף מגדיל את התשלום ב־30 ₪.</span></li>
-          <li><span class="box"></span><span>התשלום קבוע ואינו תלוי במשקל.</span></li>
-          <li><span class="box"></span><span>כל ק״ג נוסף מגדיל את התשלום ב־10 ₪.</span></li>
-          <li><span class="box"></span><span>רק הקילוגרם הראשון מחויב בתשלום.</span></li>
-        </ul>
-      </li>
+      <li><div class="p-row"><span class="p-mark">ג.</span><span class="p-text">קבעו לגבי כל היגד אם הוא נכון או לא נכון.</span></div><div class="stmts"><div class="stmt"><span class="stmt-text">על כל ק״ג נוסף התשלום גדל באותו סכום.</span><span class="blank wide"></span></div><div class="stmt"><span class="stmt-text">התשלום עבור 2 ק״ג הוא פי שניים מהתשלום עבור 1 ק״ג.</span><span class="blank wide"></span></div><div class="stmt"><span class="stmt-text">כאשר אין משקל עודף, אין תשלום נוסף.</span><span class="blank wide"></span></div></div></li>
+      <li><div class="p-row"><span class="p-mark">ד.</span><span class="p-text">איזה משפט מתאר נכון את הקשר בין המשקל העודף לתשלום?</span></div><ul class="choices"><li><span class="box"></span><span>כל ק״ג נוסף מגדיל את התשלום ב־30 ₪.</span></li><li><span class="box"></span><span>התשלום קבוע ואינו תלוי במשקל.</span></li><li><span class="box"></span><span>כל ק״ג נוסף מגדיל את התשלום ב־10 ₪.</span></li><li><span class="box"></span><span>רק הקילוגרם הראשון מחויב בתשלום.</span></li></ul></li>
       <li><div class="p-row p-row-inline"><span class="p-mark">ה.</span><span class="p-text">בהנחה שהתשלום יחסי גם לחלקי ק״ג, כמה ישלמו עבור 1.5 ק״ג משקל עודף?</span><span class="abox w-xs"></span><span class="unit">₪</span></div></li>`;
   }
 
@@ -272,6 +291,7 @@
   replaceFractions();
   adaptiveGraphSizing();
   normalizeInlineCompletions();
+  redesignOpeningPages();
   redesignPage3();
   redesignPage4And5();
   redesignPage6();
