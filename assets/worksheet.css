@@ -526,3 +526,6 @@ body{
     print-color-adjust:exact;
   }
 }
+/* טבלה שממלאים אותה מודפסת בתוך הסעיף, מיד אחרי ההוראה */
+.p-table{margin:.4mm 0 0}
+.p-table .q-table{margin:0}
