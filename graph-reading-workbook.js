@@ -1,29 +1,30 @@
 (() => {
   'use strict';
 
-  const RELEASE_VERSION = 'graph-reading-20260902-clean-viewer';
+  const RELEASE_VERSION = 'graph-reading-20260902-auto-counter-print-menu';
   const MANIFEST_URL = `meta/graph-reading-workbook.json?v=${RELEASE_VERSION}`;
   const params = new URLSearchParams(location.search);
 
   let manifest;
-  let mode = params.get('mode') === 'bw' ? 'bw' : 'color';
   let page = Math.max(1, Number(params.get('page')) || 1);
   let loadTimer = null;
+  let bookReady = false;
+  let scrollRaf = null;
 
   const $ = (id) => document.getElementById(id);
   const frame = $('pdfFrame');
   const panel = $('viewerPanel');
   const pageInput = $('pageNumber');
   const pageCount = $('pageCount');
-  const colorButton = $('colorMode');
-  const bwButton = $('bwMode');
   const prevButton = $('prevPage');
   const nextButton = $('nextPage');
   const downloadButton = $('downloadButton');
-  const openButton = $('openButton');
   const fallback = $('viewerFallback');
-  const fallbackOpen = $('fallbackOpen');
   const fallbackDownload = $('fallbackDownload');
+  const printButton = $('printButton');
+  const printMenu = $('printMenu');
+  const printColor = $('printColor');
+  const printBw = $('printBw');
 
   function clampPage(value) {
     const total = manifest?.pageCount || 165;
@@ -40,15 +41,19 @@
     return `${file.path}${separator}v=${file.sha256.slice(0, 12)}-${RELEASE_VERSION}`;
   }
 
-  function fragmentUrl(base) {
-    return `${base}#toolbar=0&navpanes=0&scrollbar=0&page=${page}&zoom=page-width`;
+  function pdfViewUrl(file) {
+    return `${versionedAssetUrl(file)}#toolbar=0&navpanes=0&scrollbar=0&page=${page}&zoom=page-width`;
+  }
+
+  function printUrl(file) {
+    return `${versionedAssetUrl(file)}#toolbar=1&navpanes=0&page=${page}&zoom=page-width`;
   }
 
   function syncUrl() {
     const url = new URL(location.href);
-    url.searchParams.set('mode', mode);
     url.searchParams.set('page', String(page));
     url.searchParams.set('release', RELEASE_VERSION);
+    url.searchParams.delete('mode');
     url.searchParams.delete('zoom');
     history.replaceState(null, '', url);
   }
@@ -61,10 +66,6 @@
     pageCount.textContent = String(total);
     prevButton.disabled = page === 1;
     nextButton.disabled = page === total;
-    colorButton.classList.toggle('is-active', mode === 'color');
-    bwButton.classList.toggle('is-active', mode === 'bw');
-    colorButton.setAttribute('aria-pressed', String(mode === 'color'));
-    bwButton.setAttribute('aria-pressed', String(mode === 'bw'));
   }
 
   function showFallback(show) {
@@ -72,13 +73,27 @@
     frame.hidden = show;
   }
 
+  function setPrintMenu(open) {
+    printMenu.hidden = !open;
+    printButton.setAttribute('aria-expanded', String(open));
+  }
+
+  function openPrintVersion(kind) {
+    if (!manifest?.files?.[kind]) return;
+    setPrintMenu(false);
+    window.open(printUrl(manifest.files[kind]), '_blank', 'noopener,noreferrer');
+  }
+
   const usesHtmlBook = /iPad|iPhone|iPod|Android/i.test(navigator.userAgent)
     || (navigator.maxTouchPoints > 1 && /Macintosh/.test(navigator.userAgent));
   const BOOK_HTML = 'מאגר-מלא.html';
-  let bookReady = false;
 
   function bookDoc() {
     try { return frame.contentDocument; } catch { return null; }
+  }
+
+  function bookWindow() {
+    try { return frame.contentWindow; } catch { return null; }
   }
 
   function applyMobileBookLayout() {
@@ -121,48 +136,67 @@
     if (target) target.scrollIntoView({ block: 'start' });
   }
 
-  function applyBookMode() {
+  function updatePageFromBookScroll() {
     const doc = bookDoc();
-    if (!doc) return;
-    let link = doc.getElementById('gzBwSheet');
+    const win = bookWindow();
+    if (!doc || !win) return;
 
-    if (mode === 'bw') {
-      if (!link) {
-        link = doc.createElement('link');
-        link.id = 'gzBwSheet';
-        link.rel = 'stylesheet';
-        link.href = 'assets/worksheet-bw.css';
-        doc.head.appendChild(link);
+    const sheets = [...doc.querySelectorAll('.a4-page')];
+    if (!sheets.length) return;
+
+    const marker = Math.max(1, win.innerHeight * 0.35);
+    let bestIndex = 0;
+    let bestDistance = Infinity;
+
+    sheets.forEach((sheet, index) => {
+      const rect = sheet.getBoundingClientRect();
+      if (rect.top <= marker && rect.bottom > marker) {
+        bestIndex = index;
+        bestDistance = -1;
+        return;
       }
-      for (const img of doc.images) {
-        if (!img.dataset.colorSrc) img.dataset.colorSrc = img.getAttribute('src');
-        img.setAttribute('src', img.dataset.colorSrc.replace(
-          /assets\/images\/([^/]+)$/, (match, filename) =>
-            `assets/images/bw/${filename.replace(/\.[^.]+$/, '.jpg')}`
-        ));
+      if (bestDistance < 0) return;
+      const distance = Math.abs((rect.top + rect.bottom) / 2 - marker);
+      if (distance < bestDistance) {
+        bestDistance = distance;
+        bestIndex = index;
       }
-    } else {
-      if (link) link.remove();
-      for (const img of doc.images) {
-        if (img.dataset.colorSrc) img.setAttribute('src', img.dataset.colorSrc);
-      }
+    });
+
+    const visiblePage = bestIndex + 1;
+    if (visiblePage !== page) {
+      page = visiblePage;
+      syncControls();
+      syncUrl();
     }
   }
 
-  function configureFileLinks(file, openHref) {
-    const downloadHref = versionedAssetUrl(file);
-    downloadButton.href = downloadHref;
+  function installBookScrollTracking() {
+    const win = bookWindow();
+    if (!win || win.__graphReadingPageTracking) return;
+    win.__graphReadingPageTracking = true;
+
+    win.addEventListener('scroll', () => {
+      if (scrollRaf !== null) return;
+      scrollRaf = requestAnimationFrame(() => {
+        scrollRaf = null;
+        updatePageFromBookScroll();
+      });
+    }, { passive: true });
+  }
+
+  function configureDownload(file) {
+    const href = versionedAssetUrl(file);
+    downloadButton.href = href;
     downloadButton.setAttribute('download', file.filename);
-    openButton.href = openHref;
-    fallbackOpen.href = openHref;
-    fallbackDownload.href = downloadHref;
+    fallbackDownload.href = href;
     fallbackDownload.setAttribute('download', file.filename);
   }
 
   function renderHtmlBook(file) {
     syncControls();
     syncUrl();
-    configureFileLinks(file, versionedAssetUrl(file));
+    configureDownload(file);
     showFallback(false);
 
     if (!bookReady) {
@@ -171,13 +205,13 @@
     }
 
     applyMobileBookLayout();
-    applyBookMode();
     fitBook();
     showBookPage();
+    installBookScrollTracking();
   }
 
   async function render({ verifySource = false } = {}) {
-    const file = manifest.files[mode];
+    const file = manifest.files.color;
 
     if (usesHtmlBook) {
       renderHtmlBook(file);
@@ -186,15 +220,15 @@
 
     syncControls();
     syncUrl();
+    configureDownload(file);
     showFallback(false);
 
     const localUrl = versionedAssetUrl(file);
-    const previewUrl = fragmentUrl(localUrl);
+    const previewUrl = pdfViewUrl(file);
 
     try {
       if (verifySource) await assertLocalPdf(localUrl);
       frame.src = previewUrl;
-      configureFileLinks(file, previewUrl);
 
       clearTimeout(loadTimer);
       loadTimer = setTimeout(() => showFallback(true), 14000);
@@ -209,14 +243,15 @@
     const normalized = clampPage(next);
     if (normalized === page) return;
     page = normalized;
-    render();
-  }
 
-  function setMode(next) {
-    if (!manifest.files[next] || next === mode) return;
-    mode = next;
-    page = 1;
-    render({ verifySource: true });
+    if (usesHtmlBook && bookReady) {
+      syncControls();
+      syncUrl();
+      showBookPage();
+      return;
+    }
+
+    render();
   }
 
   async function loadManifest() {
@@ -233,9 +268,10 @@
     if (usesHtmlBook) {
       bookReady = true;
       applyMobileBookLayout();
-      applyBookMode();
       fitBook();
       showBookPage();
+      installBookScrollTracking();
+      requestAnimationFrame(updatePageFromBookScroll);
     }
     showFallback(false);
   });
@@ -245,8 +281,6 @@
     showFallback(true);
   });
 
-  colorButton.addEventListener('click', () => setMode('color'));
-  bwButton.addEventListener('click', () => setMode('bw'));
   prevButton.addEventListener('click', () => setPage(page - 1));
   nextButton.addEventListener('click', () => setPage(page + 1));
   pageInput.addEventListener('change', () => setPage(pageInput.value));
@@ -258,17 +292,29 @@
     }
   });
 
+  printButton.addEventListener('click', (event) => {
+    event.stopPropagation();
+    setPrintMenu(printMenu.hidden);
+  });
+  printMenu.addEventListener('click', (event) => event.stopPropagation());
+  printColor.addEventListener('click', () => openPrintVersion('color'));
+  printBw.addEventListener('click', () => openPrintVersion('bw'));
+  document.addEventListener('click', () => setPrintMenu(false));
+
   $('fullscreenButton').addEventListener('click', async () => {
     try {
       if (!document.fullscreenElement) await panel.requestFullscreen();
       else await document.exitFullscreen();
     } catch {
-      window.open(openButton.href, '_blank', 'noopener,noreferrer');
+      window.open(downloadButton.href, '_blank', 'noopener,noreferrer');
     }
   });
 
   window.addEventListener('resize', () => {
-    if (usesHtmlBook && bookReady) fitBook();
+    if (usesHtmlBook && bookReady) {
+      fitBook();
+      requestAnimationFrame(updatePageFromBookScroll);
+    }
   });
 
   window.addEventListener('orientationchange', () => {
@@ -276,11 +322,13 @@
       if (usesHtmlBook && bookReady) {
         fitBook();
         showBookPage();
+        updatePageFromBookScroll();
       }
     }, 250);
   });
 
   document.addEventListener('keydown', (event) => {
+    if (event.key === 'Escape') setPrintMenu(false);
     if (event.ctrlKey || event.metaKey || event.altKey) return;
     if (event.target.matches('input,textarea,[contenteditable="true"]')) return;
     if (event.key === 'ArrowLeft' || event.key === 'PageDown') setPage(page + 1);
