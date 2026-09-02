@@ -6,21 +6,23 @@
   <meta http-equiv="Cache-Control" content="no-store, no-cache, must-revalidate, max-age=0" />
   <meta http-equiv="Pragma" content="no-cache" />
   <meta http-equiv="Expires" content="0" />
-  <meta name="graph-reading-release" content="graph-reading-20260902-clean-viewer" />
+  <meta name="graph-reading-release" content="graph-reading-20260902-auto-counter-print-menu" />
   <meta name="theme-color" content="#0f2747" />
   <title>קריאת גרפים</title>
-  <meta name="description" content="חוברת עבודה בקריאת גרפים — דפדוף, הורדה והדפסה בצבע או בשחור־לבן." />
+  <meta name="description" content="חוברת עבודה בקריאת גרפים — דפדוף, הורדה והדפסה." />
   <link rel="stylesheet" href="assets/fonts/rubik.css" />
-  <link rel="stylesheet" href="graph-reading-workbook.css?v=graph-reading-20260902-clean-viewer" />
+  <link rel="stylesheet" href="graph-reading-workbook.css?v=graph-reading-20260902-auto-counter-print-menu" />
 </head>
 <body>
   <header class="action-bar" aria-label="פעולות החוברת">
-    <div class="mode-switch" role="group" aria-label="בחירת גרסה">
-      <button id="colorMode" class="mode is-active" type="button" aria-pressed="true">צבעוני</button>
-      <button id="bwMode" class="mode" type="button" aria-pressed="false">שחור־לבן</button>
+    <div class="print-menu-wrap">
+      <button id="printButton" class="button primary" type="button" aria-expanded="false" aria-controls="printMenu">הדפסה</button>
+      <div id="printMenu" class="print-menu" role="menu" hidden>
+        <button id="printColor" class="print-option" type="button" role="menuitem">הדפסה צבעונית</button>
+        <button id="printBw" class="print-option" type="button" role="menuitem">הדפסה שחור־לבן</button>
+      </div>
     </div>
-    <a id="downloadButton" class="button primary" href="#" download>הורדת PDF</a>
-    <a id="openButton" class="button" href="#" target="_blank" rel="noopener">פתיחה והדפסה</a>
+    <a id="downloadButton" class="button" href="#" download>הורדת PDF</a>
     <button id="fullscreenButton" class="button" type="button">מסך מלא</button>
   </header>
 
@@ -39,10 +41,7 @@
       <iframe id="pdfFrame" title="קריאת גרפים — חוברת עבודה" loading="eager" allow="fullscreen"></iframe>
 
       <div id="viewerFallback" class="viewer-fallback" hidden>
-        <div>
-          <a id="fallbackOpen" class="button primary" href="#" target="_blank" rel="noopener">פתיחת החוברת</a>
-          <a id="fallbackDownload" class="button" href="#" download>הורדת PDF</a>
-        </div>
+        <a id="fallbackDownload" class="button primary" href="#" download>הורדת PDF</a>
       </div>
     </section>
   </main>
@@ -52,6 +51,6 @@
     <span>הדרכה במחוז ירושלים והעיר ירושלים - מנח״י, בהובלת איילת קריספין</span>
   </footer>
 
-  <script src="graph-reading-workbook.js?v=graph-reading-20260902-clean-viewer"></script>
+  <script src="graph-reading-workbook.js?v=graph-reading-20260902-auto-counter-print-menu"></script>
 </body>
 </html>
