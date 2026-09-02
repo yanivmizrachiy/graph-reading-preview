@@ -1,14 +1,14 @@
 :root {
   --navy: #0f2747;
   --blue: #1d4ed8;
-  --blue-2: #2563eb;
   --ink: #111827;
   --muted: #60708a;
   --line: #d7e2f2;
   --soft: #f4f7fc;
   --white: #ffffff;
-  --shadow: 0 20px 60px rgba(15, 39, 71, 0.16);
+  --shadow: 0 12px 34px rgba(15, 39, 71, 0.12);
 }
+
 * { box-sizing: border-box; }
 html { color-scheme: light; }
 body {
@@ -18,188 +18,237 @@ body {
   color: var(--ink);
   background: var(--soft);
 }
-a, button, input, select { font: inherit; }
+
+a, button, input { font: inherit; }
 button { cursor: pointer; }
-button:disabled { cursor: not-allowed; opacity: .45; }
-.topbar {
+button:disabled { cursor: not-allowed; opacity: .42; }
+
+.action-bar {
   position: sticky;
-  z-index: 20;
   top: 0;
-  min-height: 78px;
-  padding: 10px clamp(12px, 2.5vw, 36px);
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 18px;
-  background: rgba(255,255,255,.97);
-  border-bottom: 3px solid var(--blue);
-  box-shadow: 0 6px 24px rgba(15,39,71,.08);
-  backdrop-filter: blur(14px);
-}
-.brand { display: flex; align-items: center; gap: 12px; color: var(--navy); text-decoration: none; }
-.brand strong, .brand small { display: block; }
-.brand strong { font-size: 1.15rem; }
-.brand small { margin-top: 2px; color: var(--muted); }
-.district-logo { width: 56px; height: 56px; object-fit: contain; border-radius: 12px; background: #fff; }
-.actions { display: flex; align-items: center; justify-content: flex-end; gap: 8px; flex-wrap: wrap; }
-.mode-switch { display: inline-flex; overflow: hidden; border: 1px solid var(--line); border-radius: 11px; background: #fff; }
-.mode { min-height: 40px; padding: 9px 14px; border: 0; color: var(--navy); background: #fff; }
-.mode.is-active { color: #fff; background: var(--navy); }
-.button, .page-button {
-  min-height: 40px;
-  padding: 9px 14px;
-  border: 1px solid var(--line);
-  border-radius: 11px;
-  color: var(--navy);
-  text-decoration: none;
-  background: #fff;
-  font-weight: 600;
-}
-.button:hover, .page-button:hover:not(:disabled) { border-color: var(--blue); background: #f8fbff; }
-.button.primary { color: #fff; border-color: var(--blue); background: var(--blue); }
-.button:focus-visible, .mode:focus-visible, .page-button:focus-visible, input:focus-visible, select:focus-visible {
-  outline: 3px solid rgba(37,99,235,.3);
-  outline-offset: 2px;
-}
-.workbook-shell { width: min(1500px, 100%); margin: 0 auto; padding: clamp(16px, 2.5vw, 36px); }
-.intro {
-  margin-bottom: 18px;
-  padding: clamp(18px, 3vw, 34px);
-  display: flex;
-  align-items: end;
-  justify-content: space-between;
-  gap: 30px;
-  border: 1px solid var(--line);
-  border-radius: 22px;
-  background:
-    linear-gradient(120deg, rgba(29,78,216,.07), transparent 48%),
-    repeating-linear-gradient(0deg, transparent 0 41px, rgba(37,99,235,.045) 42px),
-    repeating-linear-gradient(90deg, transparent 0 41px, rgba(37,99,235,.045) 42px),
-    #fff;
-}
-.eyebrow { margin: 0 0 8px; color: var(--blue); font-size: .82rem; font-weight: 700; letter-spacing: .04em; }
-h1 { margin: 0; color: var(--navy); font-size: clamp(1.45rem, 3vw, 2.45rem); line-height: 1.2; }
-.intro p:last-child { max-width: 850px; margin: 12px 0 0; color: var(--muted); line-height: 1.65; }
-.legend { display: flex; gap: 10px; flex-wrap: wrap; justify-content: end; }
-.legend span { min-width: 92px; padding: 11px; text-align: center; color: var(--muted); border: 1px solid var(--line); border-radius: 14px; background: rgba(255,255,255,.9); }
-.legend b { display: block; color: var(--navy); font-size: 1.25rem; }
-.viewer-panel { overflow: hidden; border: 1px solid var(--line); border-radius: 20px; background: #fff; box-shadow: var(--shadow); }
-.viewer-head { min-height: 64px; padding: 12px 18px; display: flex; align-items: center; justify-content: space-between; gap: 16px; border-bottom: 1px solid var(--line); }
-.viewer-head strong, .viewer-head span { display: block; }
-.viewer-head strong { color: var(--navy); }
-.viewer-head > div > span { margin-top: 3px; color: var(--muted); font-size: .9rem; }
-.viewer-state { display: flex; align-items: center; justify-content: flex-end; gap: 8px; flex-wrap: wrap; }
-.status, .source-badge { padding: 7px 11px; border-radius: 999px; font-size: .82rem; white-space: nowrap; }
-.status { color: #166534; background: #dcfce7; }
-.status.is-loading { color: #854d0e; background: #fef3c7; }
-.status.is-error { color: #991b1b; background: #fee2e2; }
-.source-badge { color: #1e3a8a; background: #dbeafe; }
-.source-badge.is-fallback { color: #7c2d12; background: #ffedd5; }
-.page-toolbar {
-  min-height: 58px;
-  padding: 9px 14px;
+  z-index: 20;
   display: flex;
   align-items: center;
   justify-content: center;
-  gap: 10px;
+  gap: 7px;
+  flex-wrap: wrap;
+  padding: 7px 10px;
+  background: rgba(255,255,255,.98);
+  border-bottom: 2px solid var(--navy);
+  box-shadow: 0 3px 14px rgba(15,39,71,.07);
+  backdrop-filter: blur(10px);
+}
+
+.mode-switch {
+  display: inline-flex;
+  overflow: hidden;
+  border: 1px solid var(--line);
+  border-radius: 9px;
+  background: #fff;
+}
+
+.mode,
+.button,
+.page-button {
+  min-height: 38px;
+  padding: 7px 11px;
+  border: 1px solid var(--line);
+  border-radius: 9px;
+  color: var(--navy);
+  background: #fff;
+  font-weight: 600;
+  text-decoration: none;
+  touch-action: manipulation;
+}
+
+.mode {
+  border: 0;
+  border-radius: 0;
+}
+
+.mode.is-active {
+  color: #fff;
+  background: var(--navy);
+}
+
+.button.primary {
+  color: #fff;
+  border-color: var(--blue);
+  background: var(--blue);
+}
+
+.button:hover,
+.page-button:hover:not(:disabled) {
+  border-color: var(--blue);
+  background: #f8fbff;
+}
+
+.button:focus-visible,
+.mode:focus-visible,
+.page-button:focus-visible,
+input:focus-visible {
+  outline: 3px solid rgba(37,99,235,.28);
+  outline-offset: 2px;
+}
+
+.workbook-shell {
+  width: min(1500px, 100%);
+  margin: 0 auto;
+  padding: 12px;
+}
+
+.viewer-panel {
+  overflow: hidden;
+  border: 1px solid var(--line);
+  border-radius: 14px;
+  background: #fff;
+  box-shadow: var(--shadow);
+}
+
+.page-toolbar {
+  min-height: 52px;
+  padding: 7px 10px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
   flex-wrap: wrap;
   border-bottom: 1px solid var(--line);
   background: #f8fbff;
 }
-.page-jump, .zoom-control { display: inline-flex; align-items: center; gap: 7px; color: var(--muted); font-size: .9rem; }
-.page-jump input { width: 66px; min-height: 38px; padding: 6px 8px; text-align: center; border: 1px solid var(--line); border-radius: 10px; background: #fff; color: var(--navy); font-weight: 700; }
-.zoom-control select { min-height: 38px; padding: 6px 30px 6px 10px; border: 1px solid var(--line); border-radius: 10px; background: #fff; color: var(--navy); }
-#pdfFrame { display: block; width: 100%; height: calc(100vh - 285px); min-height: 680px; border: 0; background: #e8eef7; }
-.viewer-fallback { min-height: 420px; padding: 42px 20px; display: grid; place-items: center; align-content: center; gap: 12px; text-align: center; color: var(--navy); background: #f8fbff; }
+
+.page-jump {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  color: var(--muted);
+  font-size: .88rem;
+}
+
+.page-jump input {
+  width: 62px;
+  min-height: 36px;
+  padding: 5px 7px;
+  text-align: center;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background: #fff;
+  color: var(--navy);
+  font-weight: 700;
+}
+
+#pdfFrame {
+  display: block;
+  width: 100%;
+  height: calc(100dvh - 122px);
+  min-height: 680px;
+  border: 0;
+  background: #e8eef7;
+}
+
+.viewer-fallback {
+  min-height: 360px;
+  padding: 30px 16px;
+  display: grid;
+  place-items: center;
+  background: #f8fbff;
+}
+
 .viewer-fallback[hidden] { display: none; }
-.viewer-fallback > span { color: var(--muted); }
-.viewer-fallback > div { display: flex; justify-content: center; gap: 10px; flex-wrap: wrap; }
-.credits { padding: 15px 20px 20px; display: flex; flex-direction: column; gap: 4px; text-align: center; color: var(--navy); background: #fff; border-top: 2px solid var(--blue); font-size: .86rem; }
+.viewer-fallback > div {
+  display: flex;
+  justify-content: center;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.credits {
+  padding: 11px 16px 14px;
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+  text-align: center;
+  color: var(--navy);
+  background: #fff;
+  border-top: 2px solid var(--blue);
+  font-size: .8rem;
+}
 .credits span { color: var(--muted); }
-.viewer-panel:fullscreen { display: flex; flex-direction: column; width: 100vw; height: 100dvh; border: 0; border-radius: 0; }
-.viewer-panel:fullscreen #pdfFrame { flex: 1; min-height: 0; height: auto; }
-@media (max-width: 900px) {
-  .topbar { position: relative; align-items: flex-start; flex-direction: column; }
-  .actions { width: 100%; justify-content: flex-start; }
-  .intro { align-items: stretch; flex-direction: column; }
-  .legend { justify-content: flex-start; }
-  .viewer-head { align-items: flex-start; }
-  #pdfFrame { min-height: 620px; height: 76vh; }
+
+.viewer-panel:fullscreen {
+  display: flex;
+  flex-direction: column;
+  width: 100vw;
+  height: 100dvh;
+  border: 0;
+  border-radius: 0;
 }
-@media (max-width: 620px) {
-  .actions { display: grid; grid-template-columns: 1fr 1fr; }
-  .mode-switch { grid-column: 1 / -1; display: flex; }
-  .mode { flex: 1; }
-  .button { text-align: center; }
-  .workbook-shell { padding: 10px; }
-  .intro { border-radius: 16px; }
-  .viewer-panel { border-radius: 14px; }
-  .viewer-head { flex-direction: column; }
-  .viewer-state { justify-content: flex-start; }
-  .page-toolbar { display: grid; grid-template-columns: 1fr 1fr; }
-  .page-jump, .zoom-control { grid-column: 1 / -1; justify-content: center; }
-  .page-button { width: 100%; }
-  #pdfFrame { min-height: 560px; height: 72vh; }
-  .credits { font-size: .78rem; padding-inline: max(12px, env(safe-area-inset-left)); }
-}
-
-/* ======================================================================
-   התאמות מכשיר — טלפון, טאבלט, מחשב נייד ומסך גדול.
-   הבסיס מ-razpages נשמר; כאן רק מה שנדרש כדי שהחוברת עצמה תקבל את
-   מרב הגובה בכל מכשיר, ושסרגלי הניווט לא יגזלו חצי מסך בטלפון.
-   ====================================================================== */
-
-/* הכפתורים נוחים למגע בכל מקום */
-.button, .mode, .page-button { min-height: 44px; touch-action: manipulation; }
-
-@media (max-width: 900px) {
-  .workbook-shell { padding: 12px; gap: 12px; }
-  .intro { padding: 16px; }
-  .intro h1 { font-size: 1.18rem; line-height: 1.35; }
-  .intro p { font-size: .92rem; }
-  #pdfFrame { height: 78vh; height: 78dvh; min-height: 420px; }
+.viewer-panel:fullscreen #pdfFrame {
+  flex: 1;
+  min-height: 0;
+  height: auto;
 }
 
 @media (max-width: 620px) {
-  .topbar { min-height: 0; padding: 8px 12px; gap: 8px; }
-  .brand small { display: block; }
-  .intro { padding: 14px; }
-  .intro .eyebrow { display: none; }          /* המקום דרוש לחוברת עצמה */
-  .legend { gap: 8px; }
-  .legend span { padding: 6px 10px; font-size: .8rem; }
-  .viewer-head { gap: 6px; padding: 10px 12px; }
-  #viewerHelp { display: none; }
+  .action-bar {
+    position: relative;
+    gap: 5px;
+    padding: 6px;
+  }
 
-  /* סרגל ניווט קומפקטי: הקודם והבא באותה שורה, עמוד וזום בשורה שנייה */
+  .mode,
+  .button,
+  .page-button {
+    min-height: 36px;
+    padding: 6px 9px;
+    font-size: .86rem;
+  }
+
+  .workbook-shell { padding: 0; }
+
+  .viewer-panel {
+    border-inline: 0;
+    border-radius: 0;
+    box-shadow: none;
+  }
+
   .page-toolbar {
     display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 8px;
-    padding: 8px 12px;
+    grid-template-columns: 1fr auto 1fr;
+    gap: 5px;
+    padding: 6px;
   }
+
+  #prevPage { grid-column: 1; }
+  .page-jump { grid-column: 2; white-space: nowrap; }
+  #nextPage { grid-column: 3; }
   .page-button { width: 100%; }
-  .page-jump { grid-column: 1 / -1; justify-content: center; gap: 6px; }
-  .zoom-control { grid-column: 1 / -1; justify-content: center; }
-  #pdfFrame { height: 74vh; height: 74dvh; min-height: 380px; }
+
+  .page-jump input {
+    width: 52px;
+    min-height: 34px;
+  }
+
+  #pdfFrame {
+    height: calc(100dvh - 104px);
+    min-height: 520px;
+    background: #fff;
+  }
+
+  .credits {
+    font-size: .74rem;
+    padding-inline: max(10px, env(safe-area-inset-left));
+  }
 }
 
-/* טלפון בשכיבה — הגובה הוא המשאב הנדיר */
 @media (max-height: 520px) and (orientation: landscape) {
-  .intro { display: none; }
-  .viewer-head { display: none; }
-  #pdfFrame { height: 82vh; height: 82dvh; min-height: 260px; }
+  .action-bar { position: relative; }
+  #pdfFrame {
+    height: calc(100dvh - 96px);
+    min-height: 260px;
+  }
 }
 
-/* מסך רחב — החוברת לא נמתחת לרוחב אינסופי */
 @media (min-width: 1500px) {
-  .workbook-shell { max-width: 1400px; margin-inline: auto; }
-}
-
-/* הקודם והבא באותה שורה. בלי מיקום מפורש הם נופלים לשורות נפרדות,
-   כי תיבת העמוד שביניהם תופסת שורה שלמה. */
-@media (max-width: 620px) {
-  #prevPage { grid-area: 1 / 1; }
-  #nextPage { grid-area: 1 / 2; }
-  .page-jump { grid-area: 2 / 1 / auto / -1; }
-  .zoom-control { grid-area: 3 / 1 / auto / -1; }
+  .workbook-shell { max-width: 1400px; }
 }
