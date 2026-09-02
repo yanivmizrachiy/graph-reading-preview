@@ -94,11 +94,18 @@ body{
 }
 
 /* ---------- גוף הדף ---------- */
+/* --air: שטח לבן שנשאר בתחתית העמוד מחולק כאוויר בין השורות במקום
+   להיערם כפער מת בתחתית. המחולל מחשב אותו לעמוד ולא מרווח מעבר לתקרה,
+   כדי שהדף ייראה מעומד ולא מתוח. הרווח בתוך הסעיף — בין השאלה לתשובה
+   שלה — אינו גדל, כדי שהתשובה תישאר צמודה לסעיף שלה. */
+.a4-page{--air:0mm}
+.nb{white-space:nowrap}
+
 .ws-body{
   flex:1 1 auto;
   display:flex;
   flex-direction:column;
-  gap:5.5mm;
+  gap:calc(5.5mm + var(--air));
   min-height:0;
 }
 
@@ -106,7 +113,7 @@ body{
 .q{
   display:flex;
   flex-direction:column;
-  gap:2.6mm;
+  gap:calc(2.6mm + var(--air) * .7);
   break-inside:avoid;
 }
 .q-head{
@@ -148,10 +155,10 @@ body{
   background:#fff;
 }
 .q-graph svg.wsgraph{display:block;width:100%;height:auto}
-/* כותרת SVG ארוכה נשארת בתוך ה-viewBox בלי להקטין את שאר תוויות הגרף. */
-.q-graph svg.wsgraph > rect:first-child + text{font-size:15px !important}
-/* תוויות קווי סף מודגשות מוכנסות מעט פנימה באמצעות גופן קומפקטי אך קריא. */
-.q-graph svg.wsgraph > text[style*="fill:#b45309"][style*="font-size:14px"]{font-size:12px !important}
+/* גדלי הטקסט בגרף נקבעים במחולל ומפוצים על רוחב הגרף המודפס, כדי שאותיות
+   הצירים יישארו באותו גודל קריא בגרף צר וברחב כאחד. אין כאן דריסת גודל:
+   דריסה קבועה החזירה גרף צר לטקסט זעיר. כותרת ארוכה מוקטנת במחולל רק
+   כמה שנדרש כדי להישאר בתוך ה-viewBox. */
 .q-graph.narrow,.q-graph.compact{width:min(100%,118mm)}
 .q-graph.medium{width:min(100%,142mm)}
 .q-graph.wide{width:100%}
@@ -215,7 +222,7 @@ body{
   list-style:none;
   display:flex;
   flex-direction:column;
-  gap:2.4mm;
+  gap:calc(2.4mm + var(--air));
 }
 .q-parts > li{
   display:flex;
@@ -442,10 +449,20 @@ body{
 .a4-page > .gz-footer{
   flex:0 0 auto;
   margin-top:auto;
+  position:relative;
   padding-top:2.2mm;                       /* הכיתוב יורד מעט — ממורכז מול תחתית הדף */
-  border-top:2px solid #1e40af;            /* קו כחול כהה לכל רוחב התוכן */
   text-align:center;
   line-height:1.3;
+}
+/* הקו הכחול רץ מקצה לקצה של הדף. הוא מצויר כפסאודו-אלמנט ולא כמסגרת של
+   הכיתוב, כך שהוא חוצה את שולי הדף בלי שהכיתוב עצמו יֵצא מהם. */
+.a4-page > .gz-footer::before{
+  content:"";
+  position:absolute;
+  top:0;
+  left:-14mm;
+  right:-14mm;
+  border-top:2px solid #1e40af;
 }
 .a4-page > .gz-footer .f1{
   font-size:10.5px;
