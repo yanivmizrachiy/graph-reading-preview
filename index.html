@@ -14,17 +14,18 @@
 <script>
 (async () => {
   try {
-    const response = await fetch('מאגר-מלא.html?v=20260902-6', { cache: 'no-store' });
+    const response = await fetch('מאגר-מלא.html?v=20260902-7', { cache: 'no-store' });
     if (!response.ok) throw new Error('master load failed');
     const html = await response.text();
     const parsed = new DOMParser().parseFromString(html, 'text/html');
     document.body.innerHTML = parsed.body.innerHTML;
 
     const scripts = [
-      'assets/layout-fixes.js?v=20260902-6',
-      'assets/progression-fixes.js?v=20260902-6',
-      'assets/early-probability-fix.js?v=20260902-6',
-      'assets/answer-flow-fixes.js?v=20260902-6'
+      'assets/layout-fixes.js?v=20260902-7',
+      'assets/progression-fixes.js?v=20260902-7',
+      'assets/early-probability-fix.js?v=20260902-7',
+      'assets/answer-flow-fixes.js?v=20260902-7',
+      'assets/space-balance-fixes.js?v=20260902-7'
     ];
 
     for (const src of scripts) {
