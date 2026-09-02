@@ -367,7 +367,7 @@ body{
   list-style:none;
   display:flex;
   flex-wrap:wrap;                /* אפשרויות קצרות מסתדרות בכמה טורים — חוסך שורות */
-  gap:1.6mm 8mm;
+  gap:calc(1.6mm + var(--air) * .6) 8mm;
   padding-inline-start:7.6mm;
 }
 .choices li{display:flex;align-items:center;gap:2.4mm;font-size:var(--fs-part)}
@@ -434,7 +434,7 @@ body{
 .stmts{
   display:flex;
   flex-direction:column;
-  gap:1.9mm;
+  gap:calc(1.9mm + var(--air) * .6);
   padding-inline-start:7.6mm;
 }
 .stmt{display:flex;align-items:baseline;gap:3mm}

@@ -81,7 +81,7 @@
   const loading = document.getElementById('loading');
   const bar = document.getElementById('bar');
   try {
-    const response = await fetch('מאגר-מלא.html?v=20260902-13', { cache: 'no-store' });
+    const response = await fetch('מאגר-מלא.html?v=20260902-14', { cache: 'no-store' });
     if (!response.ok) throw new Error('master load failed');
     const parsed = new DOMParser().parseFromString(await response.text(), 'text/html');
     loading.remove();
