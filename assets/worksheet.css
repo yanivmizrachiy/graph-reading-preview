@@ -100,6 +100,8 @@ body{
    שלה — אינו גדל, כדי שהתשובה תישאר צמודה לסעיף שלה. */
 .a4-page{--air:0mm}
 .nb{white-space:nowrap}
+/* זוג סדור נקרא משמאל לימין גם בתוך משפט עברי, אחרת שני השיעורים מתחלפים */
+.pair{direction:ltr;unicode-bidi:isolate;white-space:nowrap}
 
 .ws-body{
   flex:1 1 auto;
@@ -204,7 +206,9 @@ body{
   min-width:14mm;
   height:8mm;
 }
-.q-table th{background:var(--bg-subtle);font-weight:600;font-size:10pt}
+/* שורת הכותרת של הטבלה נבדלת בגוון כחול עדין, כדי שברור מיד מה כל עמודה
+   מייצגת. בשחור-לבן הגוון הופך לאפור בהיר וההבחנה נשמרת. */
+.q-table th{background:#e8eefb;color:var(--box-ink);font-weight:700;font-size:10pt}
 .q-table td,.q-table th{unicode-bidi:plaintext}
 
 /* ---------- מספר מתמטי בתוך טקסט עברי ----------
@@ -234,11 +238,15 @@ body{
   align-items:baseline;
   gap:2.2mm;
 }
+/* אות הסעיף בכחול הכותרת: היא הסימן שהעין מחפשת כדי לדלג בין סעיפים.
+   הצבע נוסף על ההבחנה הקיימת (מיקום, נקודה, משקל), ולעולם אינו ההבחנה
+   היחידה — בהדפסת שחור-לבן הכול נשאר קריא. */
 .p-mark{
   flex:none;
-  font-weight:600;
+  font-weight:700;
   font-size:var(--fs-part);
   min-width:5.4mm;
+  color:var(--title-blue);
 }
 .p-text{
   font-size:var(--fs-part);
