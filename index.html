@@ -14,14 +14,27 @@
 <script>
 (async () => {
   try {
-    const response = await fetch('מאגר-מלא.html?v=20260902-4', { cache: 'no-store' });
+    const response = await fetch('מאגר-מלא.html?v=20260902-5', { cache: 'no-store' });
     if (!response.ok) throw new Error('master load failed');
     const html = await response.text();
     const parsed = new DOMParser().parseFromString(html, 'text/html');
     document.body.innerHTML = parsed.body.innerHTML;
-    const script = document.createElement('script');
-    script.src = 'assets/layout-fixes.js?v=20260902-4';
-    document.body.appendChild(script);
+
+    const scripts = [
+      'assets/layout-fixes.js?v=20260902-5',
+      'assets/progression-fixes.js?v=20260902-5',
+      'assets/early-probability-fix.js?v=20260902-5'
+    ];
+
+    for (const src of scripts) {
+      await new Promise((resolve, reject) => {
+        const script = document.createElement('script');
+        script.src = src;
+        script.onload = resolve;
+        script.onerror = reject;
+        document.body.appendChild(script);
+      });
+    }
   } catch (error) {
     document.body.innerHTML = '<div class="preview-loading">לא ניתן לטעון כרגע את המאגר. נסו לרענן את הדף.</div>';
     console.error(error);
