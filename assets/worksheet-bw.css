@@ -1,0 +1,35 @@
+/* =========================================================
+   גרסת שחור־לבן של דפי העבודה.
+   לא מסנן תמונה על העמוד: סינון גורם לדפדפן לרסטר את כל הדף,
+   הטקסט מאבד את חדות הווקטור וקובץ ה-PDF תופח פי חמישה. במקום זה
+   מוחלפים כאן הצבעים עצמם, כך שה-PDF נשאר וקטורי, חד וקטן.
+   ההבחנה בין סדרות בגרף אינה נשענת על צבע מלכתחילה — לכל סדרה
+   סוג קו וסמן משלה — ולכן היא נשמרת במלואה גם כאן.
+   ========================================================= */
+
+:root{
+  --title-blue:#1a1a1a;
+  --ink-soft:#3a3a3a;
+  --box-ink:#111111;
+  --accent-dark:#000000;
+  --rule:#8a8a8a;
+  --border-light:#d4d4d4;
+  --bg-subtle:#f2f2f2;
+}
+
+.q-table th{background:#ececec !important;color:#111111 !important}
+
+/* צבעי הסדרות בגרף — נבדלים זה מזה בבהירות, נוסף על הקו והסמן */
+svg.wsgraph [stroke="#1d4ed8"]{stroke:#2f2f2f !important}
+svg.wsgraph [fill="#1d4ed8"]{fill:#2f2f2f !important}
+svg.wsgraph [stroke="#9a3412"]{stroke:#5a5a5a !important}
+svg.wsgraph [fill="#9a3412"]{fill:#5a5a5a !important}
+svg.wsgraph [stroke="#166534"]{stroke:#7a7a7a !important}
+svg.wsgraph [fill="#166534"]{fill:#7a7a7a !important}
+svg.wsgraph [stroke="#b45309"]{stroke:#4a4a4a !important}
+svg.wsgraph [fill="#b45309"]{fill:#4a4a4a !important}
+svg.wsgraph text[style*="fill:#b45309"]{fill:#4a4a4a !important}
+svg.wsgraph text[style*="fill:#1d4ed8"]{fill:#2f2f2f !important}
+
+/* תצלומים — כאן הסינון זול, כי הם ממילא תמונות רשת */
+.page-photo img,.cover-photo{filter:grayscale(100%)}

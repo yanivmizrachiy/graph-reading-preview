@@ -276,7 +276,7 @@ body{
   display:inline-block;
   min-width:13mm;
   height:4.6mm;
-  border-bottom:.4mm solid var(--rule);
+  border-bottom:.5mm dotted var(--rule);
   white-space:nowrap;
   vertical-align:baseline;
   margin:0 .8mm;

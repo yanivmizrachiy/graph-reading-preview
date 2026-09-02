@@ -1,0 +1,28 @@
+{
+  "schemaVersion": 1,
+  "release": "graph-reading-20260902",
+  "title": "קריאת גרפים",
+  "subtitle": "חוברת עבודה — גרפים מחיי היום-יום",
+  "pageCount": 156,
+  "format": "A4",
+  "files": {
+    "color": {
+      "label": "גרסה צבעונית",
+      "filename": "graph-reading-color.pdf",
+      "path": "assets/pdf/graph-reading-color.pdf",
+      "bytes": 8493703,
+      "sha256": "999e12f9843bc3cece0be92a46d040730c08e1d2aca8c350fa885becbf86f0a0"
+    },
+    "bw": {
+      "label": "גרסה בשחור־לבן",
+      "filename": "graph-reading-bw.pdf",
+      "path": "assets/pdf/graph-reading-bw.pdf",
+      "bytes": 13390678,
+      "sha256": "fe73c4238ba20c963df60461afdbffbc892cb704ff190c5ff15d3aee75697d54"
+    }
+  },
+  "credits": [
+    "יניב רז - מדריך מחוזי חט\"ב בעיר ירושלים",
+    "הדרכה במחוז ירושלים והעיר ירושלים - מנח\"י, בהובלת איילת קריספין"
+  ]
+}
