@@ -31,5 +31,5 @@ svg.wsgraph [fill="#b45309"]{fill:#4a4a4a !important}
 svg.wsgraph text[style*="fill:#b45309"]{fill:#4a4a4a !important}
 svg.wsgraph text[style*="fill:#1d4ed8"]{fill:#2f2f2f !important}
 
-/* תצלומים — כאן הסינון זול, כי הם ממילא תמונות רשת */
-.page-photo img,.cover-photo{filter:grayscale(100%)}
+/* התצלומים אינם מסוננים כאן: הבנייה מחליפה אותם בקבצי גווני-אפור
+   (assets/images/bw/), ולכן הדף נשאר וקטורי וה-PDF אינו תופח. */

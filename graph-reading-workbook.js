@@ -55,8 +55,11 @@
   }
 
   function fragmentUrl(base) {
+    // toolbar/navpanes/scrollbar=0 מסתירים את סרגל ה-PDF של הדפדפן ואת
+    // רצועת הממוזערות, כך שהחוברת נראית כספר ולא כקובץ גולמי. הדפדוף,
+    // הזום, ההדפסה וההורדה נעשים מהכפתורים שלנו.
     const fragment = new URLSearchParams({ page: String(page), zoom });
-    return `${base}#${fragment.toString()}`;
+    return `${base}#toolbar=0&navpanes=0&scrollbar=0&${fragment.toString()}`;
   }
 
   function syncUrl() {
@@ -89,8 +92,94 @@
     frame.hidden = show;
   }
 
+  // iOS ואנדרואיד אינם מדפדפים PDF בתוך iframe: ספארי מציג עמוד אחד בלבד
+  // ומתעלם מ-#page, וכרום באנדרואיד נוטה להוריד את הקובץ במקום להציג אותו.
+  // בטלפון ובטאבלט מוצגים לכן עמודי ה-HTML עצמם, באותה מסגרת ומאותם
+  // כפתורים. ההורדה וההדפסה ממשיכות להשתמש ב-PDF בכל מכשיר.
+  const usesHtmlBook = /iPad|iPhone|iPod|Android/i.test(navigator.userAgent)
+    || (navigator.maxTouchPoints > 1 && /Macintosh/.test(navigator.userAgent));
+  const BOOK_HTML = 'מאגר-מלא.html';
+  let bookReady = false;
+
+  function bookDoc() {
+    try { return frame.contentDocument; } catch { return null; }
+  }
+
+  function fitBook() {
+    const doc = bookDoc();
+    if (!doc || !doc.documentElement) return;
+    const sheetPx = 210 * (96 / 25.4);            // רוחב A4 בפיקסלים
+    const avail = frame.clientWidth || sheetPx;
+    let scale = avail / sheetPx;
+    if (zoom === 'page-fit') {
+      const sheetH = 297 * (96 / 25.4);
+      scale = Math.min(scale, (frame.clientHeight || sheetH) / sheetH);
+    } else if (/^\d+$/.test(zoom)) {
+      scale = Number(zoom) / 100;
+    }
+    doc.documentElement.style.zoom = String(Math.max(0.15, scale));
+  }
+
+  function showBookPage() {
+    const doc = bookDoc();
+    if (!doc) return;
+    const sheets = doc.querySelectorAll('.a4-page');
+    const target = sheets[clampPage(page) - 1];
+    if (target) target.scrollIntoView({ block: 'start' });
+  }
+
+  function applyBookMode() {
+    const doc = bookDoc();
+    if (!doc) return;
+    let link = doc.getElementById('gzBwSheet');
+    if (mode === 'bw') {
+      if (!link) {
+        link = doc.createElement('link');
+        link.id = 'gzBwSheet';
+        link.rel = 'stylesheet';
+        link.href = 'assets/worksheet-bw.css';
+        doc.head.appendChild(link);
+      }
+      for (const img of doc.images) {
+        if (!img.dataset.colorSrc) img.dataset.colorSrc = img.getAttribute('src');
+        img.setAttribute('src', img.dataset.colorSrc.replace(
+          /assets\/images\/([^/]+)$/, (m, f) => `assets/images/bw/${f.replace(/\.[^.]+$/, '.jpg')}`));
+      }
+    } else {
+      if (link) link.remove();
+      for (const img of doc.images) {
+        if (img.dataset.colorSrc) img.setAttribute('src', img.dataset.colorSrc);
+      }
+    }
+  }
+
+  function renderHtmlBook(file) {
+    syncControls(file);
+    syncUrl();
+    downloadButton.href = versionedAssetUrl(file);
+    downloadButton.setAttribute('download', file.filename);
+    openButton.href = versionedAssetUrl(file);
+    fallbackOpen.href = openButton.href;
+    fallbackDownload.href = downloadButton.href;
+    fallbackDownload.setAttribute('download', file.filename);
+    sourceBadge.textContent = 'תצוגת עמודים במכשיר';
+    sourceBadge.classList.remove('is-fallback');
+    showFallback(false);
+
+    if (!bookReady) {
+      setStatus('טוען את החוברת…', 'loading');
+      frame.src = BOOK_HTML;
+      return;
+    }
+    applyBookMode();
+    fitBook();
+    showBookPage();
+    setStatus('מוכן לדפדוף');
+  }
+
   async function render({ verifySource = false } = {}) {
     const file = manifest.files[mode];
+    if (usesHtmlBook) { renderHtmlBook(file); return; }
     syncControls(file);
     syncUrl();
     setStatus('טוען את החוברת המקומית…', 'loading');
@@ -152,6 +241,12 @@
 
   frame.addEventListener('load', () => {
     clearTimeout(loadTimer);
+    if (usesHtmlBook) {
+      bookReady = true;
+      applyBookMode();
+      fitBook();
+      showBookPage();
+    }
     setStatus('מוכן לדפדוף');
     showFallback(false);
   });
@@ -184,6 +279,11 @@
     } catch {
       window.open(openButton.href, '_blank', 'noopener,noreferrer');
     }
+  });
+
+  window.addEventListener('resize', () => { if (usesHtmlBook && bookReady) fitBook(); });
+  window.addEventListener('orientationchange', () => {
+    setTimeout(() => { if (usesHtmlBook && bookReady) { fitBook(); showBookPage(); } }, 250);
   });
 
   document.addEventListener('keydown', (event) => {

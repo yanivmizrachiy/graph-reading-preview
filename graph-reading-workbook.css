@@ -142,3 +142,64 @@ h1 { margin: 0; color: var(--navy); font-size: clamp(1.45rem, 3vw, 2.45rem); lin
   #pdfFrame { min-height: 560px; height: 72vh; }
   .credits { font-size: .78rem; padding-inline: max(12px, env(safe-area-inset-left)); }
 }
+
+/* ======================================================================
+   התאמות מכשיר — טלפון, טאבלט, מחשב נייד ומסך גדול.
+   הבסיס מ-razpages נשמר; כאן רק מה שנדרש כדי שהחוברת עצמה תקבל את
+   מרב הגובה בכל מכשיר, ושסרגלי הניווט לא יגזלו חצי מסך בטלפון.
+   ====================================================================== */
+
+/* הכפתורים נוחים למגע בכל מקום */
+.button, .mode, .page-button { min-height: 44px; touch-action: manipulation; }
+
+@media (max-width: 900px) {
+  .workbook-shell { padding: 12px; gap: 12px; }
+  .intro { padding: 16px; }
+  .intro h1 { font-size: 1.18rem; line-height: 1.35; }
+  .intro p { font-size: .92rem; }
+  #pdfFrame { height: 78vh; height: 78dvh; min-height: 420px; }
+}
+
+@media (max-width: 620px) {
+  .topbar { min-height: 0; padding: 8px 12px; gap: 8px; }
+  .brand small { display: block; }
+  .intro { padding: 14px; }
+  .intro .eyebrow { display: none; }          /* המקום דרוש לחוברת עצמה */
+  .legend { gap: 8px; }
+  .legend span { padding: 6px 10px; font-size: .8rem; }
+  .viewer-head { gap: 6px; padding: 10px 12px; }
+  #viewerHelp { display: none; }
+
+  /* סרגל ניווט קומפקטי: הקודם והבא באותה שורה, עמוד וזום בשורה שנייה */
+  .page-toolbar {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 8px;
+    padding: 8px 12px;
+  }
+  .page-button { width: 100%; }
+  .page-jump { grid-column: 1 / -1; justify-content: center; gap: 6px; }
+  .zoom-control { grid-column: 1 / -1; justify-content: center; }
+  #pdfFrame { height: 74vh; height: 74dvh; min-height: 380px; }
+}
+
+/* טלפון בשכיבה — הגובה הוא המשאב הנדיר */
+@media (max-height: 520px) and (orientation: landscape) {
+  .intro { display: none; }
+  .viewer-head { display: none; }
+  #pdfFrame { height: 82vh; height: 82dvh; min-height: 260px; }
+}
+
+/* מסך רחב — החוברת לא נמתחת לרוחב אינסופי */
+@media (min-width: 1500px) {
+  .workbook-shell { max-width: 1400px; margin-inline: auto; }
+}
+
+/* הקודם והבא באותה שורה. בלי מיקום מפורש הם נופלים לשורות נפרדות,
+   כי תיבת העמוד שביניהם תופסת שורה שלמה. */
+@media (max-width: 620px) {
+  #prevPage { grid-area: 1 / 1; }
+  #nextPage { grid-area: 1 / 2; }
+  .page-jump { grid-area: 2 / 1 / auto / -1; }
+  .zoom-control { grid-area: 3 / 1 / auto / -1; }
+}
