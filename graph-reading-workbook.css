@@ -39,17 +39,13 @@ button:disabled { cursor: not-allowed; opacity: .42; }
   backdrop-filter: blur(10px);
 }
 
-.mode-switch {
-  display: inline-flex;
-  overflow: hidden;
-  border: 1px solid var(--line);
-  border-radius: 9px;
-  background: #fff;
+.print-menu-wrap {
+  position: relative;
 }
 
-.mode,
 .button,
-.page-button {
+.page-button,
+.print-option {
   min-height: 38px;
   padding: 7px 11px;
   border: 1px solid var(--line);
@@ -61,16 +57,6 @@ button:disabled { cursor: not-allowed; opacity: .42; }
   touch-action: manipulation;
 }
 
-.mode {
-  border: 0;
-  border-radius: 0;
-}
-
-.mode.is-active {
-  color: #fff;
-  background: var(--navy);
-}
-
 .button.primary {
   color: #fff;
   border-color: var(--blue);
@@ -78,17 +64,49 @@ button:disabled { cursor: not-allowed; opacity: .42; }
 }
 
 .button:hover,
-.page-button:hover:not(:disabled) {
+.page-button:hover:not(:disabled),
+.print-option:hover {
   border-color: var(--blue);
   background: #f8fbff;
 }
 
+.button.primary:hover {
+  color: #fff;
+  background: #1e40af;
+}
+
 .button:focus-visible,
-.mode:focus-visible,
 .page-button:focus-visible,
+.print-option:focus-visible,
 input:focus-visible {
   outline: 3px solid rgba(37,99,235,.28);
   outline-offset: 2px;
+}
+
+.print-menu {
+  position: absolute;
+  z-index: 60;
+  top: calc(100% + 6px);
+  inset-inline-start: 0;
+  width: max-content;
+  min-width: 168px;
+  padding: 5px;
+  display: grid;
+  gap: 4px;
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  background: #fff;
+  box-shadow: 0 12px 30px rgba(15,39,71,.16);
+}
+
+.print-menu[hidden] { display: none; }
+
+.print-option {
+  width: 100%;
+  text-align: right;
+  white-space: nowrap;
+  border-color: transparent;
+  background: #fff;
 }
 
 .workbook-shell {
@@ -155,12 +173,6 @@ input:focus-visible {
 }
 
 .viewer-fallback[hidden] { display: none; }
-.viewer-fallback > div {
-  display: flex;
-  justify-content: center;
-  gap: 8px;
-  flex-wrap: wrap;
-}
 
 .credits {
   padding: 11px 16px 14px;
@@ -196,12 +208,16 @@ input:focus-visible {
     padding: 6px;
   }
 
-  .mode,
   .button,
-  .page-button {
+  .page-button,
+  .print-option {
     min-height: 36px;
     padding: 6px 9px;
     font-size: .86rem;
+  }
+
+  .print-menu {
+    min-width: 154px;
   }
 
   .workbook-shell { padding: 0; }
