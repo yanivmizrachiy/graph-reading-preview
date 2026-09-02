@@ -1,24 +1,20 @@
 (() => {
   'use strict';
 
-  const RELEASE_VERSION = 'graph-reading-20260902-mobile-continuous';
+  const RELEASE_VERSION = 'graph-reading-20260902-clean-viewer';
   const MANIFEST_URL = `meta/graph-reading-workbook.json?v=${RELEASE_VERSION}`;
   const params = new URLSearchParams(location.search);
+
   let manifest;
   let mode = params.get('mode') === 'bw' ? 'bw' : 'color';
   let page = Math.max(1, Number(params.get('page')) || 1);
-  let zoom = params.get('zoom') || 'page-width';
   let loadTimer = null;
 
   const $ = (id) => document.getElementById(id);
   const frame = $('pdfFrame');
   const panel = $('viewerPanel');
-  const status = $('status');
-  const sourceBadge = $('sourceBadge');
-  const label = $('viewerModeLabel');
   const pageInput = $('pageNumber');
   const pageCount = $('pageCount');
-  const zoomSelect = $('zoomMode');
   const colorButton = $('colorMode');
   const bwButton = $('bwMode');
   const prevButton = $('prevPage');
@@ -29,12 +25,6 @@
   const fallbackOpen = $('fallbackOpen');
   const fallbackDownload = $('fallbackDownload');
 
-  function setStatus(text, state = 'ready') {
-    status.textContent = text;
-    status.classList.toggle('is-loading', state === 'loading');
-    status.classList.toggle('is-error', state === 'error');
-  }
-
   function clampPage(value) {
     const total = manifest?.pageCount || 165;
     return Math.min(total, Math.max(1, Number(value) || 1));
@@ -42,11 +32,7 @@
 
   async function assertLocalPdf(path) {
     const response = await fetch(path, { method: 'HEAD', cache: 'no-store' });
-    const type = response.headers.get('content-type') || '';
     if (!response.ok) throw new Error(`Local PDF HTTP ${response.status}`);
-    if (type && !type.includes('application/pdf') && !path.endsWith('.pdf')) {
-      throw new Error(`Unexpected content type: ${type}`);
-    }
   }
 
   function versionedAssetUrl(file) {
@@ -55,20 +41,19 @@
   }
 
   function fragmentUrl(base) {
-    const fragment = new URLSearchParams({ page: String(page), zoom });
-    return `${base}#toolbar=0&navpanes=0&scrollbar=0&${fragment.toString()}`;
+    return `${base}#toolbar=0&navpanes=0&scrollbar=0&page=${page}&zoom=page-width`;
   }
 
   function syncUrl() {
     const url = new URL(location.href);
     url.searchParams.set('mode', mode);
     url.searchParams.set('page', String(page));
-    url.searchParams.set('zoom', zoom);
     url.searchParams.set('release', RELEASE_VERSION);
+    url.searchParams.delete('zoom');
     history.replaceState(null, '', url);
   }
 
-  function syncControls(file) {
+  function syncControls() {
     const total = manifest.pageCount;
     page = clampPage(page);
     pageInput.value = String(page);
@@ -76,8 +61,6 @@
     pageCount.textContent = String(total);
     prevButton.disabled = page === 1;
     nextButton.disabled = page === total;
-    zoomSelect.value = [...zoomSelect.options].some((option) => option.value === zoom) ? zoom : 'page-width';
-    label.textContent = file.label;
     colorButton.classList.toggle('is-active', mode === 'color');
     bwButton.classList.toggle('is-active', mode === 'bw');
     colorButton.setAttribute('aria-pressed', String(mode === 'color'));
@@ -107,12 +90,8 @@
       style = doc.createElement('style');
       style.id = 'gzMobileContinuousPages';
       style.textContent = `
-        html, body {
-          background: #fff !important;
-        }
-        body {
-          gap: 0 !important;
-        }
+        html, body { background: #fff !important; }
+        body { gap: 0 !important; }
         .a4-page {
           margin: 0 auto !important;
           box-shadow: none !important;
@@ -129,15 +108,9 @@
     const doc = bookDoc();
     if (!doc || !doc.documentElement) return;
     const sheetPx = 210 * (96 / 25.4);
-    const avail = frame.clientWidth || sheetPx;
-    let scale = avail / sheetPx;
-    if (zoom === 'page-fit') {
-      const sheetH = 297 * (96 / 25.4);
-      scale = Math.min(scale, (frame.clientHeight || sheetH) / sheetH);
-    } else if (/^\d+$/.test(zoom)) {
-      scale = Number(zoom) / 100;
-    }
-    doc.documentElement.style.zoom = String(Math.max(0.15, scale));
+    const availableWidth = frame.clientWidth || sheetPx;
+    const scale = Math.max(0.15, availableWidth / sheetPx);
+    doc.documentElement.style.zoom = String(scale);
   }
 
   function showBookPage() {
@@ -152,6 +125,7 @@
     const doc = bookDoc();
     if (!doc) return;
     let link = doc.getElementById('gzBwSheet');
+
     if (mode === 'bw') {
       if (!link) {
         link = doc.createElement('link');
@@ -163,7 +137,9 @@
       for (const img of doc.images) {
         if (!img.dataset.colorSrc) img.dataset.colorSrc = img.getAttribute('src');
         img.setAttribute('src', img.dataset.colorSrc.replace(
-          /assets\/images\/([^/]+)$/, (m, f) => `assets/images/bw/${f.replace(/\.[^.]+$/, '.jpg')}`));
+          /assets\/images\/([^/]+)$/, (match, filename) =>
+            `assets/images/bw/${filename.replace(/\.[^.]+$/, '.jpg')}`
+        ));
       }
     } else {
       if (link) link.remove();
@@ -173,37 +149,43 @@
     }
   }
 
-  function renderHtmlBook(file) {
-    syncControls(file);
-    syncUrl();
-    downloadButton.href = versionedAssetUrl(file);
+  function configureFileLinks(file, openHref) {
+    const downloadHref = versionedAssetUrl(file);
+    downloadButton.href = downloadHref;
     downloadButton.setAttribute('download', file.filename);
-    openButton.href = versionedAssetUrl(file);
-    fallbackOpen.href = openButton.href;
-    fallbackDownload.href = downloadButton.href;
+    openButton.href = openHref;
+    fallbackOpen.href = openHref;
+    fallbackDownload.href = downloadHref;
     fallbackDownload.setAttribute('download', file.filename);
-    sourceBadge.textContent = 'תצוגת עמודים במכשיר';
-    sourceBadge.classList.remove('is-fallback');
+  }
+
+  function renderHtmlBook(file) {
+    syncControls();
+    syncUrl();
+    configureFileLinks(file, versionedAssetUrl(file));
     showFallback(false);
 
     if (!bookReady) {
-      setStatus('טוען את החוברת…', 'loading');
       frame.src = BOOK_HTML;
       return;
     }
+
     applyMobileBookLayout();
     applyBookMode();
     fitBook();
     showBookPage();
-    setStatus('מוכן לדפדוף');
   }
 
   async function render({ verifySource = false } = {}) {
     const file = manifest.files[mode];
-    if (usesHtmlBook) { renderHtmlBook(file); return; }
-    syncControls(file);
+
+    if (usesHtmlBook) {
+      renderHtmlBook(file);
+      return;
+    }
+
+    syncControls();
     syncUrl();
-    setStatus('טוען את החוברת המקומית…', 'loading');
     showFallback(false);
 
     const localUrl = versionedAssetUrl(file);
@@ -211,28 +193,14 @@
 
     try {
       if (verifySource) await assertLocalPdf(localUrl);
-
-      sourceBadge.textContent = 'קובץ מקומי מהאתר';
-      sourceBadge.classList.remove('is-fallback');
       frame.src = previewUrl;
-      openButton.href = previewUrl;
-      downloadButton.href = localUrl;
-      downloadButton.setAttribute('download', file.filename);
-      fallbackOpen.href = previewUrl;
-      fallbackDownload.href = localUrl;
-      fallbackDownload.setAttribute('download', file.filename);
+      configureFileLinks(file, previewUrl);
 
       clearTimeout(loadTimer);
-      loadTimer = setTimeout(() => {
-        setStatus('התצוגה מתעכבת — אפשר לפתוח בטאב חדש', 'error');
-        showFallback(true);
-      }, 14000);
+      loadTimer = setTimeout(() => showFallback(true), 14000);
     } catch (error) {
       console.error('[graph-reading:local-pdf]', error);
       clearTimeout(loadTimer);
-      sourceBadge.textContent = 'קובץ מקומי לא זמין';
-      sourceBadge.classList.add('is-fallback');
-      setStatus('קובץ החוברת המקומי לא נמצא', 'error');
       showFallback(true);
     }
   }
@@ -269,12 +237,11 @@
       fitBook();
       showBookPage();
     }
-    setStatus('מוכן לדפדוף');
     showFallback(false);
   });
+
   frame.addEventListener('error', () => {
     clearTimeout(loadTimer);
-    setStatus('לא ניתן להציג בתוך החלון', 'error');
     showFallback(true);
   });
 
@@ -290,10 +257,7 @@
       pageInput.blur();
     }
   });
-  zoomSelect.addEventListener('change', () => {
-    zoom = zoomSelect.value;
-    render();
-  });
+
   $('fullscreenButton').addEventListener('click', async () => {
     try {
       if (!document.fullscreenElement) await panel.requestFullscreen();
@@ -303,14 +267,22 @@
     }
   });
 
-  window.addEventListener('resize', () => { if (usesHtmlBook && bookReady) fitBook(); });
+  window.addEventListener('resize', () => {
+    if (usesHtmlBook && bookReady) fitBook();
+  });
+
   window.addEventListener('orientationchange', () => {
-    setTimeout(() => { if (usesHtmlBook && bookReady) { fitBook(); showBookPage(); } }, 250);
+    setTimeout(() => {
+      if (usesHtmlBook && bookReady) {
+        fitBook();
+        showBookPage();
+      }
+    }, 250);
   });
 
   document.addEventListener('keydown', (event) => {
     if (event.ctrlKey || event.metaKey || event.altKey) return;
-    if (event.target.matches('input,select,textarea,[contenteditable="true"]')) return;
+    if (event.target.matches('input,textarea,[contenteditable="true"]')) return;
     if (event.key === 'ArrowLeft' || event.key === 'PageDown') setPage(page + 1);
     if (event.key === 'ArrowRight' || event.key === 'PageUp') setPage(page - 1);
     if (event.key === 'Home') setPage(1);
@@ -324,9 +296,6 @@
       await render({ verifySource: true });
     } catch (error) {
       console.error('[graph-reading]', error);
-      setStatus('שגיאה בטעינת נתוני החוברת', 'error');
-      sourceBadge.textContent = 'לא זמין';
-      sourceBadge.classList.add('is-fallback');
       showFallback(true);
     }
   })();
