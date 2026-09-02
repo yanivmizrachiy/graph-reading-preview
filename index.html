@@ -14,13 +14,13 @@
 <script>
 (async () => {
   try {
-    const response = await fetch('מאגר-מלא.html?v=20260902-3', { cache: 'no-store' });
+    const response = await fetch('מאגר-מלא.html?v=20260902-4', { cache: 'no-store' });
     if (!response.ok) throw new Error('master load failed');
     const html = await response.text();
     const parsed = new DOMParser().parseFromString(html, 'text/html');
     document.body.innerHTML = parsed.body.innerHTML;
     const script = document.createElement('script');
-    script.src = 'assets/layout-fixes.js?v=20260902-3';
+    script.src = 'assets/layout-fixes.js?v=20260902-4';
     document.body.appendChild(script);
   } catch (error) {
     document.body.innerHTML = '<div class="preview-loading">לא ניתן לטעון כרגע את המאגר. נסו לרענן את הדף.</div>';
