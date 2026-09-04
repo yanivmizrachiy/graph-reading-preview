@@ -6,6 +6,7 @@ const ROOT = 'student-summaries/weekly-2026-09-04';
 const OUT_DIR = path.join(ROOT, 'assets');
 const HTML_PATH = path.join(ROOT, 'index.html');
 
+// Stable-snapshot strategy: capture Canva once, then serve only local assets.
 // These are the public view links of the four one-page Canva copies.
 // We freeze them into local PNGs so the published summary never depends on
 // Canva iframe permissions, third-party cookies, CSP, expiring thumbnails,
