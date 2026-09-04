@@ -1,0 +1,24 @@
+name: Test Canva media resize
+on:
+  push:
+    paths:
+      - '.github/workflows/test-canva-media.yml'
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Test signed Canva media URL at original dimensions
+        shell: bash
+        run: |
+          set -euxo pipefail
+          URL='https://media.canva.com/v2/image-resize/format:PNG/height:2000/quality:100/uri:ifs%3A%2F%2FM%2Fe57e58fe-97f3-4f9e-bfd4-414c5f78dc0d/watermark:F/width:1414?csig=AAAAAAAAAAAAAAAAAAAAANbo8fHB01Jtga3JkoOYxGqVIEaXYnEbQKQEt7cFSE_b&exp=1788537568&osig=AAAAAAAAAAAAAAAAAAAAACevP8yCDeD-_G2Q5XM7TlKpmB8cPmxMro7RbMSAqVMy&signer=media-rpc&x-canva-quality=thumbnail'
+          code=$(curl -L -sS -o /tmp/red.png -w '%{http_code}' "$URL")
+          echo "HTTP=$code"
+          echo "BYTES=$(wc -c < /tmp/red.png)"
+          file /tmp/red.png
+          identify /tmp/red.png || true
+          test "$code" = "200"
+          test $(wc -c < /tmp/red.png) -gt 100000
