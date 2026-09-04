@@ -1,10 +1,12 @@
 (() => {
   'use strict';
 
-  const RELEASE_VERSION = 'graph-reading-20260902-single-html-viewer';
+  const RELEASE_VERSION = 'graph-reading-20260904-single-gold-scrollbar';
   const MANIFEST_URL = `meta/graph-reading-workbook.json?v=${RELEASE_VERSION}`;
   const BOOK_HTML = `מאגר-מלא.html?v=${RELEASE_VERSION}`;
   const params = new URLSearchParams(location.search);
+  const EMBEDDED_VIEWER = window.self !== window.top;
+  document.documentElement.classList.toggle('embedded-viewer', EMBEDDED_VIEWER);
 
   let manifest;
   let page = Math.max(1, Number(params.get('page')) || 1);
@@ -25,6 +27,8 @@
   const printMenu = $('printMenu');
   const printColor = $('printColor');
   const printBw = $('printBw');
+
+  if (EMBEDDED_VIEWER) frame.setAttribute('scrolling', 'no');
 
   function clampPage(value) {
     const total = manifest?.pageCount || 165;
@@ -116,8 +120,20 @@
           margin: 0 !important;
           padding: 0 !important;
           background: #fff !important;
+          scrollbar-color: #d6aa32 #0f2747;
+          scrollbar-width: thin;
+        }
+        html::-webkit-scrollbar { width: 10px; }
+        html::-webkit-scrollbar-track { background: #0f2747; }
+        html::-webkit-scrollbar-thumb {
+          border: 2px solid #0f2747;
+          border-radius: 999px;
+          background: linear-gradient(180deg, #ffe98b, #d6aa32);
         }
         body { gap: 0 !important; }
+        body.gr-embedded-book { overflow: hidden !important; }
+        body.gr-embedded-book .a4-page { display: none !important; }
+        body.gr-embedded-book .a4-page.gr-current-page { display: flex !important; }
         .a4-page {
           margin: 0 auto !important;
           box-shadow: none !important;
@@ -128,24 +144,40 @@
       `;
       doc.head.appendChild(style);
     }
+    doc.body?.classList.toggle('gr-embedded-book', EMBEDDED_VIEWER);
   }
 
   function fitBook() {
     const doc = bookDoc();
     if (!doc?.documentElement) return;
     const sheetPx = 210 * (96 / 25.4);
+    const sheetHeightPx = 297 * (96 / 25.4);
     const availableWidth = frame.clientWidth || sheetPx;
-    const scale = Math.min(1, Math.max(0.15, availableWidth / sheetPx));
+    const availableHeight = frame.clientHeight || sheetHeightPx;
+    const widthScale = availableWidth / sheetPx;
+    const heightScale = EMBEDDED_VIEWER ? availableHeight / sheetHeightPx : 1;
+    const scale = Math.min(1, Math.max(0.15, widthScale), Math.max(0.15, heightScale));
     doc.documentElement.style.zoom = String(scale);
   }
 
   function showBookPage() {
     const pages = bookPages();
-    const target = pages[clampPage(page) - 1];
-    if (target) target.scrollIntoView({ block: 'start' });
+    const targetIndex = clampPage(page) - 1;
+    const target = pages[targetIndex];
+    if (!target) return;
+
+    if (EMBEDDED_VIEWER) {
+      pages.forEach((sheet, index) => sheet.classList.toggle('gr-current-page', index === targetIndex));
+      bookWindow()?.scrollTo(0, 0);
+      return;
+    }
+
+    pages.forEach((sheet) => sheet.classList.remove('gr-current-page'));
+    target.scrollIntoView({ block: 'start' });
   }
 
   function updatePageFromBookScroll() {
+    if (EMBEDDED_VIEWER) return;
     const win = bookWindow();
     const pages = bookPages();
     if (!win || !pages.length) return;
@@ -178,6 +210,7 @@
   }
 
   function installBookScrollTracking() {
+    if (EMBEDDED_VIEWER) return;
     const win = bookWindow();
     if (!win || win.__graphReadingPageTracking) return;
     win.__graphReadingPageTracking = true;
@@ -188,6 +221,41 @@
         scrollRaf = null;
         updatePageFromBookScroll();
       });
+    }, { passive: true });
+  }
+
+  function installEmbeddedPaging() {
+    if (!EMBEDDED_VIEWER) return;
+    const win = bookWindow();
+    if (!win || win.__graphReadingEmbeddedPaging) return;
+    win.__graphReadingEmbeddedPaging = true;
+
+    let wheelTotal = 0;
+    let wheelReset = null;
+    let touchStartY = null;
+
+    win.addEventListener('wheel', (event) => {
+      event.preventDefault();
+      wheelTotal += event.deltaY;
+      clearTimeout(wheelReset);
+      wheelReset = setTimeout(() => { wheelTotal = 0; }, 160);
+      if (Math.abs(wheelTotal) < 36) return;
+      const direction = wheelTotal > 0 ? 1 : -1;
+      wheelTotal = 0;
+      setPage(page + direction);
+    }, { passive: false });
+
+    win.addEventListener('touchstart', (event) => {
+      touchStartY = event.touches[0]?.clientY ?? null;
+    }, { passive: true });
+
+    win.addEventListener('touchend', (event) => {
+      if (touchStartY === null) return;
+      const endY = event.changedTouches[0]?.clientY ?? touchStartY;
+      const distance = touchStartY - endY;
+      touchStartY = null;
+      if (Math.abs(distance) < 42) return;
+      setPage(page + (distance > 0 ? 1 : -1));
     }, { passive: true });
   }
 
@@ -216,6 +284,7 @@
     fitBook();
     showBookPage();
     installBookScrollTracking();
+    installEmbeddedPaging();
   }
 
   function setPage(next) {
@@ -243,6 +312,7 @@
     fitBook();
     showBookPage();
     installBookScrollTracking();
+    installEmbeddedPaging();
     requestAnimationFrame(updatePageFromBookScroll);
     showFallback(false);
   });
