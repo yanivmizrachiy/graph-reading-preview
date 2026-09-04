@@ -67,7 +67,7 @@ requireText(js, 'function renderBook()', 'graph-reading-workbook.js');
 requireText(js, 'frame.src = BOOK_HTML;', 'graph-reading-workbook.js');
 requireText(js, 'const file = manifest.files.color;', 'graph-reading-workbook.js');
 
-for (const required of ['function applyBookLayout()','margin: 0 auto !important;','box-shadow: none !important;','border-top: 3px solid #0f2747 !important;','availableWidth / sheetPx','Math.min(1, Math.max(0.15, availableWidth / sheetPx))']) requireText(js, required, 'graph-reading-workbook.js');
+for (const required of ['function applyBookLayout()','margin: 0 auto !important;','box-shadow: none !important;','border-top: 3px solid #0f2747 !important;','availableWidth / sheetPx','availableHeight / sheetHeightPx','const EMBEDDED_VIEWER = window.self !== window.top','gr-current-page','function installEmbeddedPaging()']) requireText(js, required, 'graph-reading-workbook.js');
 for (const required of ['function updatePageFromBookScroll()','function installBookScrollTracking()',"win.addEventListener('scroll'",'pageInput.value = String(page);','requestAnimationFrame(updatePageFromBookScroll)']) requireText(js, required, 'graph-reading-workbook.js');
 
 requireText(js, 'pages.length !== manifest.pageCount', 'graph-reading-workbook.js');
@@ -107,7 +107,7 @@ for (const kind of ['color', 'bw']) {
   if (actualSha !== file.sha256) fail(`${file.path}: sha256=${actualSha}, manifest=${file.sha256}`);
 }
 
-for (const required of ['מקור האמת היחיד','`index.html` — נקודת הכניסה היחידה','`מאגר-מלא.html` — מקור ה-HTML היחיד שמוצג בקורא בכל המכשירים','אין תפריט "תצוגה"','ה-PDF אינו מקור לתצוגה השוטפת','מונה העמודים חייב לעקוב אחרי הגלילה בפועל בכל מכשיר','אין ליצור מקור אמת נוסף']) requireText(readme, required, 'README.md');
+for (const required of ['מקור האמת היחיד','`index.html` — נקודת הכניסה היחידה','`מאגר-מלא.html` — מקור ה-HTML היחיד שמוצג בקורא בכל המכשירים','אין תפריט "תצוגה"','ה-PDF אינו מקור לתצוגה השוטפת','בפתיחה ישירה מונה העמודים ממשיך לעקוב אחרי הגלילה בפועל','אין סרגל גלילה פנימי נוסף','אין ליצור מקור אמת נוסף']) requireText(readme, required, 'README.md');
 
 if (failures.length) {
   console.error('\nViewer contract FAILED:\n');
@@ -115,4 +115,4 @@ if (failures.length) {
   process.exit(1);
 }
 
-console.log(`Viewer contract OK: ${meta.pageCount} pages, one gold toolbar, one HTML viewer, PDFs verified by SHA-256.`);
+console.log(`Viewer contract OK: ${meta.pageCount} pages, one gold toolbar, one visible scrollbar in embeds, PDFs verified by SHA-256.`);
