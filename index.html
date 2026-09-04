@@ -6,14 +6,13 @@
   <meta http-equiv="Cache-Control" content="no-store, no-cache, must-revalidate, max-age=0" />
   <meta http-equiv="Pragma" content="no-cache" />
   <meta http-equiv="Expires" content="0" />
-  <meta name="graph-reading-release" content="graph-reading-20260904-single-gold-toolbar" />
+  <meta name="graph-reading-release" content="graph-reading-20260902-single-html-viewer" />
   <meta name="theme-color" content="#d6aa32" />
   <title>קריאת גרפים</title>
   <meta name="description" content="חוברת עבודה בקריאת גרפים — דפדוף, הורדה והדפסה." />
   <link rel="stylesheet" href="assets/fonts/rubik.css" />
-  <link rel="stylesheet" href="graph-reading-workbook.css?v=graph-reading-20260904-single-gold-toolbar" />
+  <link rel="stylesheet" href="graph-reading-workbook.css?v=graph-reading-20260902-single-html-viewer" />
   <style>
-    .action-bar{display:none!important}
     .page-toolbar{
       display:flex!important;
       flex-wrap:wrap!important;
@@ -27,27 +26,10 @@
       border-radius:14px!important;
       box-shadow:0 7px 18px rgba(177,134,23,.18)!important;
     }
-    .page-toolbar .button,.page-toolbar .page-button,.page-toolbar .print-option{
-      min-height:36px!important;
-    }
-    .page-toolbar .button,.page-toolbar .page-button{
-      background:#11203c!important;
-      color:#fff!important;
-      border-color:#11203c!important;
-    }
-    .page-toolbar .page-jump{
-      background:rgba(255,255,255,.64)!important;
-      color:#11203c!important;
-      border-radius:10px!important;
-      padding:5px 9px!important;
-    }
-    .page-toolbar .toolbar-actions{
-      display:flex;
-      flex-wrap:wrap;
-      align-items:center;
-      justify-content:center;
-      gap:8px;
-    }
+    .page-toolbar .button,.page-toolbar .page-button,.page-toolbar .print-option{min-height:36px!important}
+    .page-toolbar .button,.page-toolbar .page-button{background:#11203c!important;color:#fff!important;border-color:#11203c!important}
+    .page-toolbar .page-jump{background:rgba(255,255,255,.64)!important;color:#11203c!important;border-radius:10px!important;padding:5px 9px!important}
+    .page-toolbar .toolbar-actions{display:flex;flex-wrap:wrap;align-items:center;justify-content:center;gap:8px}
     @media(max-width:640px){
       .page-toolbar{gap:6px!important;padding:7px!important}
       .page-toolbar .toolbar-actions{width:100%;display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:6px}
@@ -80,20 +62,11 @@
           <button id="fullscreenButton" class="button" type="button">מסך מלא</button>
         </div>
       </div>
-
       <iframe id="bookFrame" title="קריאת גרפים — חוברת עבודה" loading="eager" allow="fullscreen"></iframe>
-
-      <div id="viewerFallback" class="viewer-fallback" hidden>
-        <a id="fallbackDownload" class="button primary" href="#" download>הורדת PDF</a>
-      </div>
+      <div id="viewerFallback" class="viewer-fallback" hidden><a id="fallbackDownload" class="button primary" href="#" download>הורדת PDF</a></div>
     </section>
   </main>
-
-  <footer class="credits">
-    <strong>יניב רז - מדריך מחוזי חט״ב בעיר ירושלים</strong>
-    <span>הדרכה במחוז ירושלים והעיר ירושלים - מנח״י, בהובלת איילת קריספין</span>
-  </footer>
-
-  <script src="graph-reading-workbook.js?v=graph-reading-20260904-single-gold-toolbar"></script>
+  <footer class="credits"><strong>יניב רז - מדריך מחוזי חט״ב בעיר ירושלים</strong><span>הדרכה במחוז ירושלים והעיר ירושלים - מנח״י, בהובלת איילת קריספין</span></footer>
+  <script src="graph-reading-workbook.js?v=graph-reading-20260902-single-html-viewer"></script>
 </body>
 </html>
