@@ -6,36 +6,49 @@
   <meta http-equiv="Cache-Control" content="no-store, no-cache, must-revalidate, max-age=0" />
   <meta http-equiv="Pragma" content="no-cache" />
   <meta http-equiv="Expires" content="0" />
-  <meta name="graph-reading-release" content="graph-reading-20260904-single-gold-scrollbar" />
-  <meta name="theme-color" content="#d6aa32" />
+  <meta name="graph-reading-release" content="graph-reading-20260904-slim-toolbar" />
+  <meta name="theme-color" content="#fffdf6" />
   <title>קריאת גרפים</title>
   <meta name="description" content="חוברת עבודה בקריאת גרפים — דפדוף, הורדה והדפסה." />
   <link rel="stylesheet" href="assets/fonts/rubik.css" />
-  <link rel="stylesheet" href="graph-reading-workbook.css?v=graph-reading-20260904-single-gold-scrollbar" />
+  <link rel="stylesheet" href="graph-reading-workbook.css?v=graph-reading-20260904-slim-toolbar" />
   <style>
     .page-toolbar{
       display:flex!important;
-      flex-wrap:wrap!important;
+      flex-wrap:nowrap!important;
       align-items:center!important;
       justify-content:center!important;
-      gap:8px!important;
-      min-height:58px!important;
-      padding:9px 10px!important;
-      background:linear-gradient(180deg,#ffed9f 0%,#ddb039 100%)!important;
-      border:1px solid #b58816!important;
-      border-radius:14px!important;
-      box-shadow:0 7px 18px rgba(177,134,23,.18)!important;
+      gap:5px!important;
+      min-height:40px!important;
+      padding:4px 7px!important;
+      background:#fffdf6!important;
+      border:0!important;
+      border-bottom:1px solid #d6aa32!important;
+      border-radius:0!important;
+      box-shadow:none!important;
     }
-    .page-toolbar .button,.page-toolbar .page-button,.page-toolbar .print-option{min-height:36px!important}
-    .page-toolbar .button,.page-toolbar .page-button{background:#11203c!important;color:#fff!important;border-color:#11203c!important}
-    .page-toolbar .page-jump{background:rgba(255,255,255,.64)!important;color:#11203c!important;border-radius:10px!important;padding:5px 9px!important}
-    .page-toolbar .toolbar-actions{display:flex;flex-wrap:wrap;align-items:center;justify-content:center;gap:8px}
+    .page-toolbar .button,.page-toolbar .page-button,.page-toolbar .print-option{
+      min-height:29px!important;
+      padding:4px 8px!important;
+      border:0!important;
+      border-radius:7px!important;
+      background:transparent!important;
+      color:#11203c!important;
+      font-size:11px!important;
+      font-weight:700!important;
+    }
+    .page-toolbar .button:hover,.page-toolbar .page-button:hover:not(:disabled){background:#f3e5ad!important}
+    .page-toolbar .page-jump{display:inline-flex!important;align-items:center!important;gap:4px!important;padding:2px 6px!important;border-radius:7px!important;background:#f7f3e5!important;color:#11203c!important;font-size:10px!important;white-space:nowrap!important}
+    .page-toolbar .page-jump input{width:45px!important;min-height:27px!important;padding:2px 4px!important;border:0!important;border-radius:6px!important;background:#fff!important;font-size:11px!important}
+    .page-toolbar .toolbar-actions{display:flex!important;align-items:center!important;justify-content:center!important;gap:2px!important;flex-wrap:nowrap!important}
+    .print-menu{font-size:11px!important}
     @media(max-width:640px){
-      .page-toolbar{gap:6px!important;padding:7px!important}
-      .page-toolbar .toolbar-actions{width:100%;display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:6px}
-      .page-toolbar .toolbar-actions .button,.page-toolbar .toolbar-actions .print-menu-wrap{width:100%}
-      .page-toolbar .toolbar-actions .button,.page-toolbar .toolbar-actions .print-menu-wrap>.button{width:100%;font-size:11px;padding-inline:6px}
-      .page-toolbar .page-jump{order:-1;width:100%;justify-content:center}
+      .page-toolbar{min-height:38px!important;gap:2px!important;padding:3px 4px!important;overflow-x:auto!important;justify-content:flex-start!important}
+      .page-toolbar .button,.page-toolbar .page-button{min-height:28px!important;padding:3px 6px!important;font-size:10px!important;white-space:nowrap!important}
+      .page-toolbar .page-jump{font-size:9px!important;flex:0 0 auto!important}
+      .page-toolbar .page-jump input{width:38px!important;min-height:25px!important;font-size:10px!important}
+      .page-toolbar .toolbar-actions{flex:0 0 auto!important;width:auto!important;display:flex!important;gap:1px!important}
+      .page-toolbar .toolbar-actions .button,.page-toolbar .toolbar-actions .print-menu-wrap,.page-toolbar .toolbar-actions .print-menu-wrap>.button{width:auto!important}
     }
   </style>
 </head>
@@ -44,21 +57,11 @@
     <section id="viewerPanel" class="viewer-panel" aria-label="תצוגת החוברת">
       <div class="page-toolbar" role="group" aria-label="פעולות וניווט בחוברת">
         <button id="prevPage" class="page-button" type="button">◄ הקודם</button>
-        <label class="page-jump" for="pageNumber">
-          <span>עמוד</span>
-          <input id="pageNumber" type="number" min="1" max="165" value="1" inputmode="numeric" />
-          <span>מתוך <b id="pageCount">165</b></span>
-        </label>
+        <label class="page-jump" for="pageNumber"><span>עמוד</span><input id="pageNumber" type="number" min="1" max="165" value="1" inputmode="numeric" /><span>מתוך <b id="pageCount">165</b></span></label>
         <button id="nextPage" class="page-button" type="button">הבא ►</button>
         <div class="toolbar-actions">
-          <div class="print-menu-wrap">
-            <button id="printButton" class="button primary" type="button" aria-expanded="false" aria-controls="printMenu">הדפסה</button>
-            <div id="printMenu" class="print-menu" role="menu" hidden>
-              <button id="printColor" class="print-option" type="button" role="menuitem">הדפסה צבעונית</button>
-              <button id="printBw" class="print-option" type="button" role="menuitem">הדפסה שחור־לבן</button>
-            </div>
-          </div>
-          <a id="downloadButton" class="button" href="#" download>הורדת PDF</a>
+          <div class="print-menu-wrap"><button id="printButton" class="button primary" type="button" aria-expanded="false" aria-controls="printMenu">הדפסה</button><div id="printMenu" class="print-menu" role="menu" hidden><button id="printColor" class="print-option" type="button" role="menuitem">הדפסה צבעונית</button><button id="printBw" class="print-option" type="button" role="menuitem">הדפסה שחור־לבן</button></div></div>
+          <a id="downloadButton" class="button" href="#" download>PDF</a>
           <button id="fullscreenButton" class="button" type="button">מסך מלא</button>
         </div>
       </div>
@@ -67,6 +70,6 @@
     </section>
   </main>
   <footer class="credits"><strong>יניב רז - מדריך מחוזי חט״ב בעיר ירושלים</strong><span>הדרכה במחוז ירושלים והעיר ירושלים - מנח״י, בהובלת איילת קריספין</span></footer>
-  <script src="graph-reading-workbook.js?v=graph-reading-20260904-single-gold-scrollbar"></script>
+  <script src="graph-reading-workbook.js?v=graph-reading-20260904-slim-toolbar"></script>
 </body>
 </html>
