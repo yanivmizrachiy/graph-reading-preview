@@ -13,10 +13,10 @@
   --navy:#0c1829;
   --ink:#152436;
   --paper:#fffdf9;
-  --blue:#4054c7;
-  --plum:#783f6f;
-  --teal:#087b78;
-  --coral:#c95e49;
+  --blue:#2F3C7E;
+  --plum:#6A405F;
+  --teal:#176B66;
+  --coral:#A8553E;
   --gold:#c89a45;
   --shadow:0 20px 56px rgba(2,10,22,.28);
 }
@@ -32,6 +32,7 @@ body{font-family:"Heebo",Arial,sans-serif;color:var(--ink);background:radial-gra
 .cover h1{margin:18px 0 7px;font:800 clamp(3.2rem,11vw,6.2rem)/.98 "Frank Ruhl Libre";color:var(--navy)}
 .cover-class{font:800 clamp(1.9rem,7vw,3.5rem)/1.05 "Frank Ruhl Libre";color:var(--blue)}
 .cover-date{font:700 clamp(1rem,3.5vw,1.35rem) "Rubik";color:#687386}
+.cover-teacher{margin-top:15px;font-size:clamp(.9rem,2.8vw,1.15rem);color:#687386}
 .opening-page{background:#142b4c;color:#fff}
 .hero-video{display:block;width:100%;flex:1 1 0;min-height:0;object-fit:cover;background:#142b4c}
 .opening{display:flex;align-items:center;justify-content:center;gap:15px;padding:22px 20px;background:#142b4c;border-top:1px solid rgba(255,255,255,.18)}
@@ -53,6 +54,11 @@ body{font-family:"Heebo",Arial,sans-serif;color:var(--ink);background:radial-gra
 .white .box{background:rgba(255,255,255,.92)}
 .color .box{background:rgba(255,255,255,.10);border-color:rgba(255,255,255,.35)}
 .color .page-num{color:currentColor}
+.section-tag{font:800 clamp(.88rem,2.8vw,1.12rem) "Rubik";letter-spacing:.04em;opacity:.78}
+.big-line{margin-top:18px;font:800 clamp(1.45rem,5vw,2.55rem)/1.38 "Frank Ruhl Libre"}
+.quote{margin-top:22px;padding:18px 20px;border-right:5px solid currentColor;background:rgba(255,255,255,.10);border-radius:14px;font-size:clamp(1.02rem,3vw,1.42rem);line-height:1.62}
+.white .quote{background:rgba(0,0,0,.025)}
+.human-list li{margin:.45em 0}
 .canva-a4{padding:0;background:#fff}
 .canva-frame{position:absolute;inset:0;width:100%;height:100%;overflow:hidden;background:#fff}
 .canva-frame .canva-embed{position:absolute;inset:0;width:100%!important;max-width:none!important;margin:0!important;border-radius:0!important;box-shadow:none!important}
@@ -70,6 +76,9 @@ body{font-family:"Heebo",Arial,sans-serif;color:var(--ink);background:radial-gra
   .content ul{font-size:clamp(.86rem,3.7vw,1rem);line-height:1.48}
   .content li{margin:.18em 0}
   .box{font-size:clamp(.84rem,3.55vw,.98rem);line-height:1.48;padding:14px 15px}
+  .section-tag{font-size:.78rem}
+  .big-line{font-size:clamp(1.25rem,5.6vw,1.7rem)}
+  .quote{font-size:clamp(.86rem,3.6vw,1rem);line-height:1.48;padding:13px 14px}
   .page-num{left:8px;bottom:7px;width:25px;height:25px;font-size:9px}
 }
 @media print{@page{size:A4;margin:0}html,body{background:#fff}.document{display:block;padding:0}.sheet{width:210mm;max-width:none;height:297mm;aspect-ratio:auto;box-shadow:none;border-radius:0;break-after:page}}
