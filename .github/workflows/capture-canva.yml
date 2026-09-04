@@ -1,0 +1,49 @@
+name: Freeze Canva pages into weekly summary
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - '.github/workflows/capture-canva.yml'
+      - '.github/scripts/capture-canva-pages.mjs'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  capture:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          ref: main
+          fetch-depth: 0
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Install Playwright
+        run: |
+          npm init -y >/dev/null 2>&1
+          npm install --no-save playwright@1.55.0
+          npx playwright install --with-deps chromium
+
+      - name: Capture Canva pages as local PNGs
+        run: node .github/scripts/capture-canva-pages.mjs
+
+      - name: Commit stable snapshots
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add student-summaries/weekly-2026-09-04/index.html student-summaries/weekly-2026-09-04/assets/canva-page-*.png
+          if git diff --cached --quiet; then
+            echo "No snapshot changes to commit."
+            exit 0
+          fi
+          git commit -m "Freeze Canva pages as stable local assets"
+          git push origin main
