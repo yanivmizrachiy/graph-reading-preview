@@ -1,8 +1,9 @@
 name: Deploy GitHub Pages
 
+# GitHub Pages for this repository is already deployed automatically from main.
+# Keep this workflow only as an explicit manual fallback so two automatic
+# deployments do not race and cancel each other.
 on:
-  push:
-    branches: [main]
   workflow_dispatch:
 
 permissions:
@@ -11,8 +12,8 @@ permissions:
   id-token: write
 
 concurrency:
-  group: pages
-  cancel-in-progress: true
+  group: pages-manual
+  cancel-in-progress: false
 
 jobs:
   deploy:
