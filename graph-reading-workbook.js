@@ -1,15 +1,14 @@
 (() => {
   'use strict';
 
-  const RELEASE_VERSION = 'graph-reading-20260904-single-gold-scrollbar';
+  const RELEASE_VERSION = 'graph-reading-20260904-cover-first';
   const MANIFEST_URL = `meta/graph-reading-workbook.json?v=${RELEASE_VERSION}`;
   const BOOK_HTML = `מאגר-מלא.html?v=${RELEASE_VERSION}`;
-  const params = new URLSearchParams(location.search);
   const EMBEDDED_VIEWER = window.self !== window.top;
   document.documentElement.classList.toggle('embedded-viewer', EMBEDDED_VIEWER);
 
   let manifest;
-  let page = Math.max(1, Number(params.get('page')) || 1);
+  let page = 1;
   let bookReady = false;
   let scrollRaf = null;
 
